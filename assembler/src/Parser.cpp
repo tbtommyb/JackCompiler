@@ -1,5 +1,3 @@
-#include <iostream>
-#include <algorithm>
 #include "Parser.hpp"
 
 const std::regex Parser::A_command{"^@([0-9]+|[a-zA-Z_\\.\\$0-9]+)"};
@@ -8,10 +6,9 @@ const std::regex Parser::C_command{"([A-Z]{1,3})=(.+);([A-Z]{3})"};
 const std::regex Parser::C_command_no_dest{"(.+);([A-Z]{3})"};
 const std::regex Parser::C_command_no_jump{"([A-Z]{1,3})=(.+)"};
 
-Parser::Parser(std::istream& input) : stream(input) { };
+Parser::Parser(std::istream &input) : stream(input){};
 
-const Instruction Parser::parse()
-{
+const Instruction Parser::parse() {
     auto type = commandType();
     Instruction instruction{.type = type};
 
@@ -26,8 +23,7 @@ const Instruction Parser::parse()
     return instruction;
 }
 
-bool Parser::hasMoreCommands() noexcept
-{
+bool Parser::hasMoreCommands() {
     auto c = stream.peek();
     if (c == EOF) {
         return false;
@@ -35,8 +31,7 @@ bool Parser::hasMoreCommands() noexcept
     return true;
 };
 
-void Parser::advance()
-{
+void Parser::advance() {
     std::string input;
     std::getline(stream, input);
     currentLine = sanitise(input);
@@ -47,8 +42,7 @@ void Parser::advance()
     }
 };
 
-CommandType Parser::commandType()
-{
+CommandType Parser::commandType() {
     std::smatch match;
 
     if (std::regex_match(currentLine, match, A_command)) {
@@ -102,31 +96,16 @@ CommandType Parser::commandType()
     throw InvalidCommand{currentLine};
 };
 
-const std::string& Parser::symbol() const
-{
-    return A_value;
-};
+const std::string &Parser::symbol() const { return A_value; };
 
-const std::string& Parser::dest() const
-{
-    return C_dest;
-};
+const std::string &Parser::dest() const { return C_dest; };
 
-const std::string& Parser::comp() const
-{
-    return C_comp;
-};
+const std::string &Parser::comp() const { return C_comp; };
 
-const std::string& Parser::jump() const
-{
-    return C_jump;
-};
+const std::string &Parser::jump() const { return C_jump; };
 
-std::string Parser::sanitise(std::string s)
-{
-    s.erase(std::remove_if(
-                           s.begin(),
-                           s.end(),
+std::string Parser::sanitise(std::string s) {
+    s.erase(std::remove_if(s.begin(), s.end(),
                            [](unsigned char x) { return std::isspace(x); }),
             s.end());
     auto commentPos = s.find("//");

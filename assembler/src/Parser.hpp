@@ -1,10 +1,11 @@
 #ifndef __parser__
 #define __parser__
 
+#include "InvalidCommand.hpp"
+#include <algorithm>
+#include <iostream>
 #include <regex>
 #include <string>
-#include <fstream>
-#include "InvalidCommand.hpp"
 
 enum CommandType { A_COMMAND, C_COMMAND, L_COMMAND };
 
@@ -17,20 +18,22 @@ struct Instruction {
 };
 
 class Parser {
-public:
-    Parser(std::istream&);
+  public:
+    Parser(std::istream &);
     ~Parser() = default;
-    bool hasMoreCommands() noexcept;
+    Parser(Parser const &other) = default;
+    bool hasMoreCommands();
     void advance();
     const Instruction parse();
-private:
+
+  private:
     CommandType commandType();
-    const std::string& symbol() const;
-    const std::string& dest() const;
-    const std::string& comp() const;
-    const std::string& jump() const;
+    const std::string &symbol() const;
+    const std::string &dest() const;
+    const std::string &comp() const;
+    const std::string &jump() const;
     std::string sanitise(std::string);
-    std::istream& stream;
+    std::istream &stream;
     std::string currentLine, A_value, C_dest, C_comp, C_jump;
     static const std::regex A_command;
     static const std::regex L_command;

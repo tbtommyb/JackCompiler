@@ -1,7 +1,14 @@
 #include "src/Assemblr.hpp"
 
-int main(int argc, char* argv[])
-{
+std::string getFilename(std::string input) {
+    std::istringstream iss{input};
+    if (std::getline(iss, input, '.')) {
+        return input;
+    }
+    return "";
+};
+
+int main(int argc, char *argv[]) {
     if (argc != 2) {
         std::cerr << "USAGE: assemblr input.asm" << std::endl;
         exit(1);
@@ -12,7 +19,7 @@ int main(int argc, char* argv[])
     auto filename = getFilename(input);
     std::ofstream out{filename + ".hack"};
 
-    Assemble(program, out);
+    Assemblr{program, out}.run();
     out.close();
 
     return 0;

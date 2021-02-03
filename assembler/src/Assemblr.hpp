@@ -1,16 +1,26 @@
 #ifndef __assemblr__
 #define __assemblr__
 
-#include <iostream>
+#include "Code.hpp"
+#include "Parser.hpp"
+#include "SymbolTable.hpp"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include "Parser.hpp"
-#include "Code.hpp"
-#include "SymbolTable.hpp"
 
-void Assemble(std::istream& program, std::ostream& out);
-void buildSymbolTable(SymbolTable& table, Parser& parser);
-std::string getFilename(std::string input);
+class Assemblr {
+  public:
+    Assemblr(std::istream &program, std::ostream &out);
+    void run();
+
+  private:
+    void buildSymbolTable(SymbolTable &table, Parser &parser);
+    std::ostream &out;
+
+    std::istream &program;
+    SymbolTable symbols;
+    Parser parser;
+};
 
 #endif

@@ -1,16 +1,6 @@
 #include "Assemblr.hpp"
 
-std::string getFilename(std::string input)
-{
-    std::istringstream iss{input};
-    if (std::getline(iss, input, '.')) {
-        return input;
-    }
-    return "";
-};
-
-void buildSymbolTable(SymbolTable& table, Parser& parser)
-{
+void Assemblr::buildSymbolTable(SymbolTable &table, Parser &parser) {
     unsigned int instructionAddress = 0x0000;
 
     while (parser.hasMoreCommands()) {
@@ -19,7 +9,7 @@ void buildSymbolTable(SymbolTable& table, Parser& parser)
 
         try {
             instruction = parser.parse();
-        } catch (const InvalidCommand& e) {
+        } catch (const InvalidCommand &e) {
             std::cerr << "Invalid command: " << e.what() << std::endl;
             exit(1);
         }
@@ -36,14 +26,9 @@ void buildSymbolTable(SymbolTable& table, Parser& parser)
     }
 }
 
-void Assemble(std::istream & program, std::ostream & out)
-{
-    SymbolTable symbols{};
-    Parser symbolParser{program};
-    buildSymbolTable(symbols, symbolParser);
-
+void Assemblr::run() {
+    buildSymbolTable(symbols, parser);
     program.seekg(0);
-    Parser parser{program};
 
     while (parser.hasMoreCommands()) {
         parser.advance();
@@ -51,7 +36,7 @@ void Assemble(std::istream & program, std::ostream & out)
 
         try {
             instruction = parser.parse();
-        } catch (const InvalidCommand& e) {
+        } catch (const InvalidCommand &e) {
             std::cerr << "Invalid command: " << e.what() << std::endl;
             exit(1);
         }
@@ -63,3 +48,6 @@ void Assemble(std::istream & program, std::ostream & out)
     }
 }
 
+Assemblr::Assemblr(std::istream &program, std::ostream &out)
+    : out(out), program(program), symbols(SymbolTable{}),
+      parser(Parser{program}) {}

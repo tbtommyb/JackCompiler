@@ -1,17 +1,18 @@
 #ifndef __code__
 #define __code__
 
-#include <string>
 #include "Parser.hpp"
 #include "SymbolTable.hpp"
+#include <string>
 
 class Code {
-public:
-    Code(Instruction& instr, SymbolTable& mapping);
+  public:
+    Code(Instruction &instr, SymbolTable &mapping);
     ~Code() = default;
     const std::string string() const;
-private:
-    SymbolTable& mappings;
+
+  private:
+    SymbolTable &mappings;
     Instruction instruction;
     std::bitset<3> dest;
     std::bitset<7> comp;
