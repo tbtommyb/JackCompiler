@@ -1,10 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include "Parser.hpp"
-#include "Code.hpp"
-#include "SymbolTable.hpp"
+#include "Assemblr.hpp"
 
 std::string getFilename(std::string input)
 {
@@ -42,18 +36,8 @@ void buildSymbolTable(SymbolTable& table, Parser& parser)
     }
 }
 
-int  main(int argc, char* argv[])
+void Assemble(std::istream & program, std::ostream & out)
 {
-    if (argc != 2) {
-        std::cerr << "USAGE: assemblr input.asm" << std::endl;
-        exit(1);
-    }
-    auto input = argv[1];
-    std::ifstream program{input};
-
-    auto filename = getFilename(input);
-    std::ofstream out{filename + ".hack"};
-
     SymbolTable symbols{};
     Parser symbolParser{program};
     buildSymbolTable(symbols, symbolParser);
@@ -77,8 +61,5 @@ int  main(int argc, char* argv[])
             out << code.string() << std::endl;
         }
     }
+}
 
-    out.close();
-
-    return 0;
-};

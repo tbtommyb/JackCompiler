@@ -1,3 +1,6 @@
 assemblr
 *.hack
 *.asm
+**/*.o
+build/
+tests

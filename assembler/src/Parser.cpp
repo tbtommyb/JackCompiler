@@ -8,7 +8,7 @@ const std::regex Parser::C_command{"([A-Z]{1,3})=(.+);([A-Z]{3})"};
 const std::regex Parser::C_command_no_dest{"(.+);([A-Z]{3})"};
 const std::regex Parser::C_command_no_jump{"([A-Z]{1,3})=(.+)"};
 
-Parser::Parser(std::ifstream& input) : stream(input) { };
+Parser::Parser(std::istream& input) : stream(input) { };
 
 const Instruction Parser::parse()
 {
