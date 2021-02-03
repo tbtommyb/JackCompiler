@@ -7,12 +7,19 @@
 #include "Assemblr.hpp"
 
 TEST_CASE("Expected .hack output", "[Assemble]") {
-    std::ifstream testInput{"../test/inputs/Add.asm"};
-    std::ifstream expected{"../test/inputs/Add.hack"};
-    std::string content((std::istreambuf_iterator<char>(expected)),
-                        (std::istreambuf_iterator<char>()));
-    std::stringstream output;
-    Assemblr *assemblr = new Assemblr{testInput, output};
-    assemblr->run();
-    REQUIRE(output.str() == content);
+    std::string inputFiles[]{"Add",   "Max",  "MaxL", "Pong",
+                             "PongL", "Rect", "RectL"};
+
+    for (auto const &file : inputFiles) {
+        SECTION(file) {
+            std::ifstream testInput{"../test/inputs/" + file + ".asm"};
+            std::ifstream expected{"../test/inputs/" + file + ".hack"};
+            std::string content((std::istreambuf_iterator<char>(expected)),
+                                (std::istreambuf_iterator<char>()));
+            std::stringstream output;
+            Assemblr *assemblr = new Assemblr{testInput, output};
+            assemblr->run();
+            REQUIRE(output.str() == content);
+        }
+    }
 }
