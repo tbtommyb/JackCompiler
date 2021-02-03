@@ -1,0 +1,52 @@
+[
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -I/Users/thomasbarrett/coding/JackCompiler/assembler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/test/Assemblr-Test.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/test/Assemblr-Test.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/test/Assemblr-Test.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -I/Users/thomasbarrett/coding/JackCompiler/assembler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Assemblr.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Assemblr.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Assemblr.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -I/Users/thomasbarrett/coding/JackCompiler/assembler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Code.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Code.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Code.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -I/Users/thomasbarrett/coding/JackCompiler/assembler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Parser.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Parser.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Parser.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -I/Users/thomasbarrett/coding/JackCompiler/assembler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/SymbolTable.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/SymbolTable.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/SymbolTable.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++     -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -o CMakeFiles/assemblr.dir/src/Assemblr.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Assemblr.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Assemblr.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++     -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -o CMakeFiles/assemblr.dir/src/Code.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Code.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Code.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++     -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -o CMakeFiles/assemblr.dir/src/Parser.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/Parser.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/Parser.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++     -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -o CMakeFiles/assemblr.dir/src/SymbolTable.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/src/SymbolTable.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/src/SymbolTable.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/assembler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++     -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -o CMakeFiles/assemblr.dir/main.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/assembler/main.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/assembler/main.cpp"
+}
+]
