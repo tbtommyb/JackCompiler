@@ -1,9 +1,7 @@
 #include "SymbolTable.hpp"
 #include <iostream>
 
-unsigned int SymbolTable::currentVariableAddress = 0x0010;
-
-SymbolTable::SymbolTable() : mapping{} {
+SymbolTable::SymbolTable() : mapping{}, currentVariableAddress(0x0010) {
     addEntry("SP", 0x0000);
     addEntry("LCL", 0x0001);
     addEntry("ARG", 0x0002);

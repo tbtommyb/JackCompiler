@@ -15,7 +15,7 @@ class SymbolTable {
 
   private:
     std::map<std::string, unsigned int> mapping;
-    static unsigned int currentVariableAddress;
+    unsigned int currentVariableAddress;
 };
 
 #endif

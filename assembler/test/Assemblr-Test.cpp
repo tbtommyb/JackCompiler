@@ -14,12 +14,16 @@ TEST_CASE("Expected .hack output", "[Assemble]") {
         SECTION(file) {
             std::ifstream testInput{"../test/inputs/" + file + ".asm"};
             std::ifstream expected{"../test/inputs/" + file + ".hack"};
-            std::string content((std::istreambuf_iterator<char>(expected)),
-                                (std::istreambuf_iterator<char>()));
+
             std::stringstream output;
-            Assemblr *assemblr = new Assemblr{testInput, output};
-            assemblr->run();
-            REQUIRE(output.str() == content);
+            std::stringstream content;
+            content << expected.rdbuf();
+
+            Assemblr{testInput, output}.run();
+            testInput.close();
+            expected.close();
+
+            REQUIRE(output.str() == content.str());
         }
     }
 }
