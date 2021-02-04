@@ -1,0 +1,42 @@
+[
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/vm/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/test/VM-Test.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/test/VM-Test.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/test/VM-Test.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/vm/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/CodeWriter.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/CodeWriter.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/CodeWriter.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/vm/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Parser.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/Parser.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/Parser.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/vm/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/VM.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/VM.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/VM.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/vm.dir/src/CodeWriter.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/CodeWriter.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/CodeWriter.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/vm.dir/src/Parser.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/Parser.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/Parser.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/vm.dir/src/VM.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/src/VM.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/src/VM.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/vm/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/vm.dir/main.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/vm/main.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/vm/main.cpp"
+}
+]

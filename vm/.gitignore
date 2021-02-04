@@ -1,7 +1,8 @@
-assemblr
+vm
 *.hack
 *.asm
 **/*.o
 build/
 tests
+test
 .cache
