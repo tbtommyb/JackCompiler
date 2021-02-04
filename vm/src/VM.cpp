@@ -1,6 +1,21 @@
 #include "VM.hpp"
 
-VM::VM(CodeWriter &writer) : writer(writer) {}
+VM::VM(std::ostream &output) : writer{output} {}
+
+void VM::run(fs::path &input) {
+    if (fs::is_directory(input)) {
+        for (const auto &entry : fs::directory_iterator(input)) {
+
+            if (entry.path().extension() == ".vm") {
+                std::ifstream inputFile{entry.path().string()};
+                process(inputFile, entry.path().stem().string());
+            }
+        }
+    } else {
+        std::ifstream inputFile{input.string()};
+        process(inputFile, input.stem().string());
+    }
+}
 
 void VM::process(std::istream &input, const std::string inputName) {
     writer.setCurrentFile(inputName);

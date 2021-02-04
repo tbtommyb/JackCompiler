@@ -15,8 +15,3 @@ if(Boost_FOUND)
 endif()
 
 target_compile_options(vm PUBLIC -std=c++17 -Wall -Wextra -pedantic)
-
-find_package(Catch2 REQUIRED)
-add_executable(tests ${test_sources} ${sources})
-target_link_libraries(tests PRIVATE Boost::filesystem Catch2::Catch2 Catch2::Catch2WithMain)
-target_include_directories(tests PRIVATE src)

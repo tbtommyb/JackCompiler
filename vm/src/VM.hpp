@@ -9,12 +9,15 @@
 #include "CodeWriter.hpp"
 #include "Parser.hpp"
 
+namespace fs = boost::filesystem;
+
 class VM {
   public:
-    VM(CodeWriter &writer);
+    VM(std::ostream &output);
+    void run(fs::path &input);
     void process(std::istream &input, std::string inputName);
 
   private:
-    CodeWriter &writer;
+    CodeWriter writer;
 };
 #endif

@@ -17,7 +17,6 @@ class CodeWriter {
     void writeCall(const Command &command);
     void writeFunction(const Command &command);
     void writeReturn();
-    std::string currentFilename, currentFunction;
 
   private:
     void pop(const std::string &dest);
@@ -39,6 +38,7 @@ class CodeWriter {
     void equalityFn(const std::string &label, const std::string &comparison);
     std::ostream &out;
     int labelIndex, frameIndex, callCount;
+    std::string currentFilename, currentFunction;
 };
 
 #endif
