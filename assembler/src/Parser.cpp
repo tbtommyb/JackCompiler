@@ -10,7 +10,8 @@ Parser::Parser(std::istream &input) : stream(input){};
 
 const Instruction Parser::parse() {
     auto type = commandType();
-    Instruction instruction{.type = type};
+    Instruction instruction{};
+    instruction.type = type;
 
     if (type == C_COMMAND) {
         instruction.dest = dest();

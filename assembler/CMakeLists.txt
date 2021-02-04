@@ -5,7 +5,7 @@ file(GLOB_RECURSE sources src/*.cpp src/*.hpp)
 file(GLOB_RECURSE test_sources test/*.cpp)
 
 add_executable(assemblr ${sources} main.cpp)
-target_compile_options(assemblr PUBLIC -std=c++17 -Wall)
+target_compile_options(assemblr PUBLIC -std=c++17 -Wall -Wextra -pedantic)
 
 find_package(Catch2 REQUIRED)
 add_executable(tests ${test_sources} ${sources})
