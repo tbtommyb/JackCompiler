@@ -3,9 +3,11 @@
 
 class InvalidCommand : public std::exception {
   public:
-    InvalidCommand(std::string command) : command(command) {}
-    ~InvalidCommand() noexcept {}
-    virtual const char *what() const noexcept { return command.c_str(); }
+    InvalidCommand(std::string &command) : command(std::move(command)) {}
+    ~InvalidCommand() noexcept override = default;
+    [[nodiscard]] const char *what() const noexcept override {
+        return command.c_str();
+    }
 
   private:
     std::string command;

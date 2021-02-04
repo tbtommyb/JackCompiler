@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "USAGE: assemblr input.asm" << std::endl;
         exit(1);
     }
-    auto input = argv[1];
+    auto *input = argv[1];
     std::ifstream program{input};
 
     auto filename = getFilename(input);

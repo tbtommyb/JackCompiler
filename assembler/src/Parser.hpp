@@ -28,10 +28,10 @@ class Parser {
 
   private:
     CommandType commandType();
-    const std::string &symbol() const;
-    const std::string &dest() const;
-    const std::string &comp() const;
-    const std::string &jump() const;
+    [[nodiscard]] const std::string &symbol() const;
+    [[nodiscard]] const std::string &dest() const;
+    [[nodiscard]] const std::string &comp() const;
+    [[nodiscard]] const std::string &jump() const;
     std::string sanitise(std::string);
     std::istream &stream;
     std::string currentLine, A_value, C_dest, C_comp, C_jump;
