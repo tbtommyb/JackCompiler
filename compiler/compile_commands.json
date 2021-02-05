@@ -1,0 +1,72 @@
+[
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/test/Compiler-Test.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/test/Compiler-Test.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/test/Compiler-Test.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/CompilationEngine.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/CompilationEngine.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/CompilationEngine.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Compiler.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/Compiler.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/Compiler.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/JackTokenizer.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/JackTokenizer.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/JackTokenizer.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/SymbolTable.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/SymbolTable.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/SymbolTable.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/Tokens.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/Tokens.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/Tokens.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -I/Users/thomasbarrett/coding/JackCompiler/compiler/src -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -std=gnu++11 -o CMakeFiles/tests.dir/src/VMWriter.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/VMWriter.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/VMWriter.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/CompilationEngine.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/CompilationEngine.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/CompilationEngine.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/Compiler.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/Compiler.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/Compiler.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/JackTokenizer.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/JackTokenizer.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/JackTokenizer.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/SymbolTable.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/SymbolTable.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/SymbolTable.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/Tokens.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/Tokens.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/Tokens.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/src/VMWriter.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/src/VMWriter.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/src/VMWriter.cpp"
+},
+{
+  "directory": "/Users/thomasbarrett/coding/JackCompiler/compiler/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -isystem /usr/local/include   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk   -g -std=c++17 -Wall -Wextra -pedantic -o CMakeFiles/compiler.dir/main.cpp.o -c /Users/thomasbarrett/coding/JackCompiler/compiler/main.cpp",
+  "file": "/Users/thomasbarrett/coding/JackCompiler/compiler/main.cpp"
+}
+]

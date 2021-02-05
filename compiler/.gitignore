@@ -1,0 +1,6 @@
+compiler
+*.vm
+*.asm
+**/*.o
+build/
+.cache
