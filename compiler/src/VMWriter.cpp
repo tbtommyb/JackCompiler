@@ -32,6 +32,7 @@ void VMWriter::writeReturn() { write("return"); };
 
 bool VMWriter::write(const std::string &cmd, const std::string &arg1,
                      const std::string &arg2) {
-    out << cmd << " " << arg1 << " " << arg2 << std::endl;
+    out << cmd << (arg1.empty() ? "" : " " + arg1)
+        << (arg2.empty() ? "" : " " + arg2) << std::endl;
     return out.good();
 };

@@ -7,7 +7,7 @@
 #include "Compiler.hpp"
 
 TEST_CASE("Expected .vm output", "[Compiler]") {
-    std::string testCases[]{"Seven"};
+    std::string testCases[]{"Average", "ComplexArrays", "ConvertToBin", "Seven"};
 
     for (auto const &testCase : testCases) {
         SECTION(testCase) {
@@ -30,8 +30,10 @@ TEST_CASE("Expected .vm output", "[Compiler]") {
             std::string exp = content.str();
             for (std::string::size_type i = 0; i < out.size(); ++i) {
                 if (out[i] != exp[i]) {
-                    std::cout << "at :" << i << " " << out[i]
-                              << " does not match" << std::endl;
+                    std::cout << "at :" << i << " " << std::hex << (int)out[i]
+                              << " does not match " << std::hex << (int)exp[i]
+                              << std::endl;
+                    REQUIRE(false);
                 }
             }
             REQUIRE(output.str() == content.str());
