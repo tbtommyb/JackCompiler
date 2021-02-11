@@ -76,8 +76,7 @@ class JackTokenizer {
     bool isInteger(const std::string &);
     bool isString(const std::string &);
     bool isIdentifier(const std::string &);
-    std::istream_iterator<char> it;
-    std::istream_iterator<char> end;
+    std::istream& it;
     int lineNumber;
     TokenList tokens;
 };

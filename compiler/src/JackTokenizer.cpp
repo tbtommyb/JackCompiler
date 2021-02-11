@@ -1,7 +1,6 @@
 #include "JackTokenizer.hpp"
 
-JackTokenizer::JackTokenizer(std::istream &in)
-    : it{in}, end{}, lineNumber{1} {};
+JackTokenizer::JackTokenizer(std::istream &in) : it{in}, lineNumber{1} {};
 
 TokenList JackTokenizer::tokenize() {
     while (moreCharsRemain()) {
@@ -23,17 +22,18 @@ bool JackTokenizer::moreCharsRemain() {
 
     skipCommentBlock();
 
-    return it != end;
+    return !it.eof();
 };
 
 std::string JackTokenizer::scan() {
     std::string lexeme;
-    char c;
+    char c = advance();
 
-    do {
+    lexeme += c;
+    while (isalnum(c) && isalnum(peek())) {
         c = advance();
         lexeme += c;
-    } while (isalnum(c));
+    }
 
     if (lexeme[0] == '\n') {
         lineNumber++;
@@ -54,7 +54,7 @@ std::string JackTokenizer::scan() {
 
 void JackTokenizer::skipCommentBlock() {
     if (peek() == '/' && peekNext() == '/') {
-        std::advance(it, 2);
+        it.seekg(2, std::ios::cur);
         while (peek() != '\n') {
             advance();
         }
@@ -64,21 +64,25 @@ void JackTokenizer::skipCommentBlock() {
         return;
     }
 
-    std::advance(it, 2);
+    it.seekg(2, std::ios::cur);
 
     while (!(peek() == '*' && peekNext() == '/')) {
         advance();
     }
 
-    std::advance(it, 2);
+    it.seekg(2, std::ios::cur);
 };
 
-char JackTokenizer::advance() {
-    return *it++; // increment, return prev
-};
+char JackTokenizer::advance() { return it.get(); }
 
-char JackTokenizer::peek() { return *it; }
-char JackTokenizer::peekNext() { return *(std::next(it)); }
+char JackTokenizer::peek() { return it.peek(); }
+
+char JackTokenizer::peekNext() {
+    it.get();
+    char c = it.peek();
+    it.unget();
+    return c;
+}
 
 Token JackTokenizer::toToken(const std::string &input) {
     TokenType tokenType;

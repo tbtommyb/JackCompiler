@@ -505,7 +505,7 @@ bool CompilationEngine::compileSubroutineCall() {
             auto segment = kindSegmentMap.at(symbol.kind);
             numArgs += 1;
             vmWriter.writePush(segment, symbol.id);
-        } catch (CompilationError e) {
+        } catch (const CompilationError &e) {
             // it's a class
             typeName = ident.src;
         }
