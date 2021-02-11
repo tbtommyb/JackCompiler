@@ -3,6 +3,10 @@
 // by Nisan and Schocken, MIT Press.
 // File name: projects/11/Seven/Main.jack
 
+/** this is a multiline comment
+ *  this should be ok
+ *  to parse
+ **/
 class Main {
 
    function void main() {

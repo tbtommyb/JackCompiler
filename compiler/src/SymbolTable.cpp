@@ -1,44 +1,38 @@
-#include <iostream>
 #include "SymbolTable.hpp"
+#include <iostream>
 
 // TODOs
 // cerr
 
-std::string Symbol::toString() const
-{
-    return "<identifier kind='" +
-        SymbolKind::toString(kind) +
-        "' type='" + type +
-        "' id='" + std::to_string(id) +
-        "'>" + name + "</identifier>";
+std::string Symbol::toString() const {
+    return "<identifier kind='" + SymbolKind::toString(kind) + "' type='" +
+           type + "' id='" + std::to_string(id) + "'>" + name + "</identifier>";
 };
 
 std::map<std::string, SymbolKind::Enum> symbolMap = {
-    { "static", SymbolKind::STATIC },
-    { "field", SymbolKind::FIELD },
-    { "argument", SymbolKind::ARGUMENT },
-    { "var", SymbolKind::VAR },
+    {"static", SymbolKind::STATIC},
+    {"field", SymbolKind::FIELD},
+    {"argument", SymbolKind::ARGUMENT},
+    {"var", SymbolKind::VAR},
 };
 
-void SymbolTable::startSubroutine()
-{
+void SymbolTable::startSubroutine() {
     subroutineMap.clear();
     argumentCount = 0;
     varCount = 0;
 };
 
-Symbol SymbolTable::addSymbol(std::shared_ptr<Token> name, std::shared_ptr<Token> type, std::shared_ptr<Token> kind)
-{
-    return addSymbol(name->valToString(), type->valToString(), symbolMap.at(kind->valToString()));
+Symbol SymbolTable::addSymbol(Token name, Token type, Token kind) {
+    return addSymbol(name.src, type.src, symbolMap.at(kind.src));
 };
 
-Symbol SymbolTable::addSymbol(std::shared_ptr<Token> name, std::shared_ptr<Token> type, const SymbolKind::Enum& kind)
-{
-    return addSymbol(name->valToString(), type->valToString(), kind);
+Symbol SymbolTable::addSymbol(Token name, Token type,
+                              const SymbolKind::Enum &kind) {
+    return addSymbol(name.src, type.src, kind);
 };
 
-Symbol SymbolTable::addSymbol(const std::string& name, const std::string& type, const SymbolKind::Enum& kind)
-{
+Symbol SymbolTable::addSymbol(const std::string &name, const std::string &type,
+                              const SymbolKind::Enum &kind) {
     int count = 0;
     switch (kind) {
     case SymbolKind::STATIC:
@@ -57,7 +51,7 @@ Symbol SymbolTable::addSymbol(const std::string& name, const std::string& type, 
         std::cout << "Could not add " << name << " of type none." << std::endl;
     };
 
-    Symbol entry = { name, type, kind, count };
+    Symbol entry = {name, type, kind, count};
 
     if (kind == SymbolKind::STATIC || kind == SymbolKind::FIELD) {
         classMap[name] = entry;
@@ -68,21 +62,19 @@ Symbol SymbolTable::addSymbol(const std::string& name, const std::string& type, 
     return entry;
 };
 
-std::shared_ptr<Symbol> SymbolTable::getSymbol(const std::string& name)
-{
-    auto srIter = subroutineMap.find(name);
+Symbol SymbolTable::getSymbol(Token name) {
+    auto srIter = subroutineMap.find(name.src);
     if (srIter != subroutineMap.end()) {
-        return std::make_shared<Symbol>(srIter->second);
+        return srIter->second;
     }
-    auto cIter = classMap.find(name);
+    auto cIter = classMap.find(name.src);
     if (cIter != classMap.end()) {
-        return std::make_shared<Symbol>(cIter->second);
+        return srIter->second;
     }
-    return nullptr;
+    throw new CompilationError{"Symbol " + name.src + " not found"};
 };
 
-int SymbolTable::getCount(const SymbolKind::Enum& kind)
-{
+int SymbolTable::getCount(const SymbolKind::Enum &kind) {
     switch (kind) {
     case SymbolKind::STATIC:
         return staticCount;

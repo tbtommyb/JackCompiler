@@ -1,82 +1,77 @@
 #include "CompilationEngine.hpp"
 
-template<typename T>
-bool oneOf(T t)
-{
+template <typename T>
+bool oneOf(T t) {
     try {
         return t();
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         return false;
     }
 };
 
-template<typename T, typename... As>
-bool oneOf(T t, As... Fs)
-{
+template <typename T, typename... As>
+bool oneOf(T t, As... Fs) {
     try {
-        if(t()) { return true; }
+        if (t()) {
+            return true;
+        }
         return oneOf(Fs...);
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         return oneOf(Fs...);
     }
 };
 
-template<typename T>
-std::shared_ptr<Token> oneOfToken(T t)
-{
+template <typename T>
+Token oneOfToken(T t) {
     return t();
 };
 
-template<typename T, typename... As>
-std::shared_ptr<Token> oneOfToken(T t, As... Fs)
-{
+template <typename T, typename... As>
+Token oneOfToken(T t, As... Fs) {
     try {
         return t();
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         return oneOfToken(Fs...);
     }
 };
 
 std::map<SymbolKind::Enum, Segment::Enum> kindSegmentMap = {
-    { SymbolKind::STATIC, Segment::STATIC },
-    { SymbolKind::FIELD, Segment::THIS },
-    { SymbolKind::ARGUMENT, Segment::ARG },
-    { SymbolKind::VAR, Segment::LOCAL },
+    {SymbolKind::STATIC, Segment::STATIC},
+    {SymbolKind::FIELD, Segment::THIS},
+    {SymbolKind::ARGUMENT, Segment::ARG},
+    {SymbolKind::VAR, Segment::LOCAL},
 };
 
-std::map<char, std::string> opCommandMap = {
-    { '+', "add" },
-    { '-', "sub" },
-    { '*', "call Math.multiply 2" },
-    { '/', "call Math.divide 2" },
-    { '<', "lt", },
-    { '>', "gt" },
-    { '=', "eq" },
-    { '&', "and" },
-    { '|', "or" },
+std::map<TokenType, std::string> opCommandMap = {
+    {TokenType::PLUS, "add"},
+    {TokenType::HYPHEN, "sub"},
+    {TokenType::STAR, "call Math.multiply 2"},
+    {TokenType::FORWARD_SLASH, "call Math.divide 2"},
+    {TokenType::LESS_THAN, "lt"},
+    {TokenType::GREATER_THAN, "gt"},
+    {TokenType::EQUALS, "eq"},
+    {TokenType::AMPERSAND, "and"},
+    {TokenType::BAR, "or"},
 };
 
-std::map<char, std::string> unaryOpCommandMap = {
-    { '-', "neg" },
-    { '~', "not" },
-};
+std::map<TokenType, std::string> unaryOpCommandMap = {
+    {TokenType::HYPHEN, "neg"}, {TokenType::TILDE, "not"}};
 
-const std::vector<char16_t> opList = {'+', '-', '*', '/', '&', '|', '<', '>', '='};
-const std::vector<std::string> opStringList = {"+", "-", "*", "/", "&", "|", "<", ">", "="};
+MatchOptions ops = {
+    TokenType::PLUS,          TokenType::HYPHEN,       TokenType::STAR,
+    TokenType::FORWARD_SLASH, TokenType::AMPERSAND,    TokenType::BAR,
+    TokenType::LESS_THAN,     TokenType::GREATER_THAN, TokenType::EQUALS};
 
-CompilationEngine::CompilationEngine(TokenList& tokens, std::ostream& out) : token(tokens.begin()), vmWriter(out), labelCount(0)
-{
-    symbolTable = SymbolTable{};
-}
+CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
+    : token{tokens.begin()}, vmWriter{out}, labelCount{0}, symbolTable{} {}
 
 // Public compilation methods
 // ==========================
 
-bool CompilationEngine::compile()
-{
+bool CompilationEngine::compile() {
     try {
         compileClass();
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         std::cerr << "Compilation error: " << e.what() << std::endl;
         return false;
     }
@@ -84,16 +79,15 @@ bool CompilationEngine::compile()
     return true;
 };
 
-bool CompilationEngine::compileClass()
-{
+bool CompilationEngine::compileClass() {
     // 'class' className '{' classVarDec* subroutineDec* '}'
 
-    readKeyword({"class"});
-    const auto& ident = readIdentifier();
+    consume({TokenType::CLASS});
+    Token ident = consume({TokenType::IDENTIFIER});
 
-    className = ident->valToString();
+    className = ident.src;
 
-    readSymbol({'{'});
+    consume({TokenType::LBRACE});
 
     zeroOrMany([this] { return compileClassVarDec(); });
     zeroOrMany([this] { return compileSubroutineDec(); });
@@ -101,77 +95,83 @@ bool CompilationEngine::compileClass()
     return true;
 };
 
-bool CompilationEngine::compileClassVarDec()
-{
+bool CompilationEngine::compileClassVarDec() {
     // ('static' | 'field' ) type varName (',' varName)* ';'
 
-    if (!tokenMatches({"static", "field"})) return false;
-
-    const auto& kw = readKeyword({"static", "field"});
-    const auto& type = readType();
-    const auto& ident = readIdentifier();
-
-    auto symbol = symbolTable.addSymbol(ident, type, kw);
-
-    while(tokenMatches({","})) {
-        token++;
-        const auto& ident = readIdentifier();
-        auto symbol = symbolTable.addSymbol(ident, type, kw);
+    if (!match({TokenType::STATIC, TokenType::FIELD})) {
+        return false;
     }
 
-    readSymbol({';'});
+    Token keyword = consume({TokenType::STATIC, TokenType::FIELD});
+    Token type = readType();
+    Token varName = consume({TokenType::IDENTIFIER});
+
+    auto symbol = symbolTable.addSymbol(varName, type, keyword);
+
+    while (match({TokenType::COMMA})) {
+        consume({TokenType::COMMA});
+        Token ident = consume({TokenType::IDENTIFIER});
+        auto symbol = symbolTable.addSymbol(ident, type, keyword);
+    }
+
+    consume({TokenType::SEMICOLON});
 
     return true;
 };
 
-bool CompilationEngine::compileSubroutineDec()
-{
+bool CompilationEngine::compileSubroutineDec() {
     // ('constructor' | 'function' | 'method')
     // ('void' | type) subroutineName '(' parameterList ')'
     // subroutineBody
 
-    if (!tokenMatches({"constructor", "function", "method"})) return false;
+    if (!match(
+            {TokenType::CONSTRUCTOR, TokenType::FUNCTION, TokenType::METHOD})) {
+        return false;
+    }
 
     symbolTable.startSubroutine();
     vmWriter.write("// Compiling subroutine");
 
-    const auto& kw = readKeyword({"constructor", "function", "method"});
-    if (kw->valToString() == "method") {
+    Token keyword = consume(
+        {TokenType::CONSTRUCTOR, TokenType::FUNCTION, TokenType::METHOD});
+    if (keyword.tokenType == TokenType::METHOD) {
         symbolTable.addSymbol("this", className, SymbolKind::ARGUMENT);
     }
 
-    oneOfToken(
-               [this] { return readKeyword({"void"}); },
-               [this] { return readType(); }
-               );
-    const auto& ident = readIdentifier();
+    Token type = oneOfToken([this] { return consume({TokenType::VOID}); },
+                            [this] { return readType(); });
+    Token ident = consume({TokenType::IDENTIFIER});
 
-    readSymbol({'('});
+    consume({TokenType::LPAREN});
     compileParameterList();
-    readSymbol({')'});
+    consume({TokenType::RPAREN});
 
-    compileSubroutineBody(ident, kw);
+    // TODO add type
+    compileSubroutineBody(ident, keyword);
     vmWriter.write("// End subroutine");
 
     return true;
 };
 
-bool CompilationEngine::compileParameterList()
-{
+bool CompilationEngine::compileParameterList() {
     // ((type varName) (',' type varName)*)?
 
-    if(!(tokenMatches({"int", "char", "boolean"}) || std::dynamic_pointer_cast<IdentifierToken>(*token))) { return false; }
+    // TODO: this looks wrong
+    if (!(match({TokenType::INT, TokenType::CHAR, TokenType::BOOLEAN,
+                 TokenType::IDENTIFIER}))) {
+        return false;
+    }
 
-    if (!tokenMatches({")"})) {
-        const auto& type = readType();
-        const auto& ident = readIdentifier();
+    if (!match({TokenType::RPAREN})) {
+        Token type = readType();
+        Token ident = consume({TokenType::IDENTIFIER});
 
         symbolTable.addSymbol(ident, type, SymbolKind::ARGUMENT);
 
-        while (tokenMatches({","})) {
-            token++;
-            const auto& type = readType();
-            const auto& ident = readIdentifier();
+        while (match({TokenType::COMMA})) {
+            consume({TokenType::COMMA});
+            Token type = readType();
+            Token ident = consume({TokenType::IDENTIFIER});
 
             symbolTable.addSymbol(ident, type, SymbolKind::ARGUMENT);
         }
@@ -180,111 +180,117 @@ bool CompilationEngine::compileParameterList()
     return true;
 };
 
-bool CompilationEngine::compileVarDec()
-{
+bool CompilationEngine::compileVarDec() {
     // 'var' type varName (',' varName)* ';'
 
-    if (!tokenMatches({"var"})) return false;
-
-    const auto& kw = readKeyword({"var"});
-    const auto& type = readType();
-    const auto& ident = readIdentifier();
-
-    symbolTable.addSymbol(ident, type, kw);
-
-    while (tokenMatches({","})) {
-        token++;
-        const auto& ident = readIdentifier();
-        symbolTable.addSymbol(ident, type, kw);
+    if (!match({TokenType::VAR})) {
+        return false;
     }
 
-    readSymbol({';'});
+    Token keyword = consume({TokenType::VAR});
+    Token type = readType();
+    Token ident = consume({TokenType::IDENTIFIER});
+
+    symbolTable.addSymbol(ident, type, keyword);
+
+    while (match({TokenType::COMMA})) {
+        consume({TokenType::COMMA});
+        Token ident = consume({TokenType::IDENTIFIER});
+        symbolTable.addSymbol(ident, type, keyword);
+    }
+
+    consume({TokenType::SEMICOLON});
 
     return true;
 };
 
-bool CompilationEngine::compileSubroutineBody(const std::shared_ptr<Token> name, const std::shared_ptr<Token> kw)
-{
+bool CompilationEngine::compileSubroutineBody(Token name, Token keyword) {
     // '{' varDec* statements '}'
 
-    // Change this pattern to readSymbol
-    if (!tokenMatches({"{"})) return false;
+    if (!(match({TokenType::LBRACE}))) {
+        return false;
+    }
 
     vmWriter.write("// Compiling subroutine body");
-    readSymbol({'{'});
+    consume({TokenType::LBRACE});
 
     zeroOrMany([this] { return compileVarDec(); });
 
     // TODO add 1 for methods
-    vmWriter.writeFunction(className + "." + name->valToString(), symbolTable.getCount(SymbolKind::VAR));
+    vmWriter.writeFunction(className + "." + name.src,
+                           symbolTable.getCount(SymbolKind::VAR));
 
-    if (kw->valToString() == "constructor") {
-        vmWriter.writePush(Segment::CONST, symbolTable.getCount(SymbolKind::FIELD));
+    if (keyword.tokenType == TokenType::CONSTRUCTOR) {
+        vmWriter.writePush(Segment::CONST,
+                           symbolTable.getCount(SymbolKind::FIELD));
         vmWriter.writeCall("Memory.alloc", 1);
         vmWriter.writePop(Segment::POINTER, 0);
-    } else if (kw->valToString() == "method") {
+    } else if (keyword.tokenType == TokenType::METHOD) {
         vmWriter.writePush(Segment::ARG, 0);
         vmWriter.writePop(Segment::POINTER, 0);
     }
 
     compileStatements();
 
-    readSymbol({'}'});
+    consume({TokenType::RBRACE});
     vmWriter.write("// End subroutine body");
 
     return true;
 };
 
-bool CompilationEngine::compileStatements()
-{
+bool CompilationEngine::compileStatements() {
     // statement*
 
     // TODO logging semicolon so not incrementing token somewhere
-    if (!tokenMatches({"let", "if", "else", "while", "do", "return"})) return false;
+    if (!match({TokenType::LET, TokenType::IF, TokenType::ELSE,
+                TokenType::WHILE, TokenType::DO, TokenType::RETURN})) {
+        return false;
+    }
 
     zeroOrMany([this] { return compileStatement(); });
 
     return true;
 };
 
-bool CompilationEngine::compileStatement()
-{
-    // letStatement | ifStatement | whileStatement | doStatement | returnStatement
+bool CompilationEngine::compileStatement() {
+    // letStatement | ifStatement | whileStatement | doStatement |
+    // returnStatement
 
     return oneOf(
-                 [this] { return compileLet(); },
-                 [this] { return compileIf(); },
-                 [this] { return compileWhile(); },
-                 [this] { return compileDo(); },
-                 [this] { return compileReturn(); }
-                 );
+        [this] { return compileLet(); }, [this] { return compileIf(); },
+        [this] { return compileWhile(); }, [this] { return compileDo(); },
+        [this] { return compileReturn(); });
 };
 
-bool CompilationEngine::compileLet()
-{
+bool CompilationEngine::compileLet() {
     // 'let' varName ('[' expression ']')? '=' expression ';'
 
-    if (!tokenMatches({"let"})) return false;
+    if (!match({TokenType::LET})) {
+        return false;
+    }
 
     bool arrayAccess = false;
 
     vmWriter.write("// Compiling let");
-    readKeyword({"let"});
-    const auto& ident = symbolTable.getSymbol(readIdentifier()->valToString());
-    auto segment = kindSegmentMap.at(ident->kind);
+    consume({TokenType::LET});
 
-    if (tokenMatches({"["})) {
-        token++;
+    Token ident = consume({TokenType::IDENTIFIER});
+    Symbol symbol = symbolTable.getSymbol(ident);
+    auto segment = kindSegmentMap.at(symbol.kind);
+
+    if (match({TokenType::LBRACKET})) {
+        consume({TokenType::LBRACKET});
         arrayAccess = true;
-        vmWriter.writePush(segment, ident->id);
+        vmWriter.writePush(segment, symbol.id);
         compileExpression();
-        readSymbol({']'});
+
+        consume({TokenType::RBRACKET});
         vmWriter.write("add");
     }
 
-    readSymbol({'='});
+    consume({TokenType::EQUALS});
     compileExpression();
-    readSymbol({';'});
+    consume({TokenType::SEMICOLON});
 
     if (arrayAccess) {
         vmWriter.writePop(Segment::TEMP, 1);
@@ -292,43 +298,45 @@ bool CompilationEngine::compileLet()
         vmWriter.writePush(Segment::TEMP, 1);
         vmWriter.writePop(Segment::THAT, 0);
     } else {
-        vmWriter.writePop(segment, ident->id);
+        vmWriter.writePop(segment, symbol.id);
     }
 
     return true;
 };
 
-bool CompilationEngine::compileIf()
-{
-    // 'if '(' expression ')' '{' statements '}' ('else' '{' statements '}')?
+bool CompilationEngine::compileIf() {
+    // 'if '(' expression ')' '{' statements '}' ('else' '{' statements
+    // '}')?
 
-    if (!tokenMatches({"if"})) return false;
+    if (!match({TokenType::IF})) {
+        return false;
+    }
 
     vmWriter.write("// Compiling if");
-    readKeyword({"if"});
+    consume({TokenType::IF});
     auto endLabel = newLabel();
 
-    readSymbol({'('});
+    consume({TokenType::LPAREN});
     compileExpression();
-    readSymbol({')'});
+    consume({TokenType::RPAREN});
 
     vmWriter.write("not");
     auto notLabel = newLabel();
     vmWriter.writeIf(notLabel);
 
-    readSymbol({ '{' });
+    consume({TokenType::LBRACE});
     compileStatements();
-    readSymbol({ '}' });
+    consume({TokenType::RBRACE});
 
     vmWriter.writeGoto(endLabel);
     vmWriter.writeLabel(notLabel);
 
-    if (tokenMatches({"else"})) {
-        token++;
+    if (match({TokenType::ELSE})) {
+        consume({TokenType::ELSE});
         vmWriter.write("// Compiling else");
-        readSymbol({'{'});
+        consume({TokenType::LBRACE});
         compileStatements();
-        readSymbol({'}'});
+        consume({TokenType::RBRACE});
     }
 
     vmWriter.writeLabel(endLabel);
@@ -336,28 +344,29 @@ bool CompilationEngine::compileIf()
     return true;
 };
 
-bool CompilationEngine::compileWhile()
-{
+bool CompilationEngine::compileWhile() {
     // 'while' '(' expression ')' '{' statements '}'
 
-    if (!tokenMatches({"while"})) return false;
+    if (!match({TokenType::WHILE})) {
+        return false;
+    }
 
     vmWriter.write("// Compiling while");
-    readKeyword({"while"});
+    consume({TokenType::WHILE});
     auto topLabel = newLabel();
     vmWriter.writeLabel(topLabel);
 
-    readSymbol({'('});
+    consume({TokenType::LPAREN});
     compileExpression();
-    readSymbol({')'});
+    consume({TokenType::RPAREN});
 
     vmWriter.write("not");
     auto notLabel = newLabel();
     vmWriter.writeIf(notLabel);
 
-    readSymbol({ '{' });
+    consume({TokenType::LBRACE});
     compileStatements();
-    readSymbol({ '}' });
+    consume({TokenType::RBRACE});
 
     vmWriter.writeGoto(topLabel);
     vmWriter.writeLabel(notLabel);
@@ -365,33 +374,35 @@ bool CompilationEngine::compileWhile()
     return true;
 };
 
-bool CompilationEngine::compileDo()
-{
+bool CompilationEngine::compileDo() {
     // 'do' subroutineCall ';'
 
-    if (!tokenMatches({"do"})) return false;
+    if (!match({TokenType::DO})) {
+        return false;
+    }
 
     vmWriter.write("// Compiling do");
-    readKeyword({"do"});
+    consume({TokenType::DO});
 
     compileSubroutineCall();
 
-    readSymbol({';'});
+    consume({TokenType::SEMICOLON});
     vmWriter.writePop(Segment::TEMP, 0);
 
     return true;
 };
 
-bool CompilationEngine::compileReturn()
-{
+bool CompilationEngine::compileReturn() {
     // 'return' expression? ';'
 
-    if (!tokenMatches({"return"})) return false;
+    if (!match({TokenType::RETURN})) {
+        return false;
+    }
 
     vmWriter.write("// Compiling return");
-    readKeyword({"return"});
+    consume({TokenType::RETURN});
 
-    if (!tokenMatches({";"})) {
+    if (!match({TokenType::SEMICOLON})) {
         zeroOrOnce([this] { return compileExpression(); });
     } else {
         vmWriter.writePush(Segment::CONST, 0);
@@ -399,22 +410,21 @@ bool CompilationEngine::compileReturn()
 
     vmWriter.writeReturn();
 
-    readSymbol({';'});
+    consume({TokenType::SEMICOLON});
 
     return true;
 };
 
-bool CompilationEngine::compileExpression()
-{
+bool CompilationEngine::compileExpression() {
     // term (op term)*
 
     compileTerm();
 
     zeroOrMany([this] {
-        if (tokenMatches(opStringList)) {
-            const auto& op = readSymbol(opList);
+        if (match(ops)) {
+            Token op = consume(ops);
             compileTerm();
-            vmWriter.write(opCommandMap.at(op->getVal()));
+            vmWriter.write(opCommandMap.at(op));
             // token++;
             return true;
         }
@@ -424,45 +434,44 @@ bool CompilationEngine::compileExpression()
     return true;
 };
 
-bool CompilationEngine::compileTerm()
-{
+bool CompilationEngine::compileTerm() {
     // integerConstant | stringConstant | keywordConstant | varName |
     // varName '[' expression ']' | subroutineCall |
     // '(' expression ')' | unaryOp term
 
-    oneOf(
-          [this] { return compileIntConst(); },
+    oneOf([this] { return compileIntConst(); },
           [this] { return compileStringConst(); },
           [this] { return compileKeywordConstant(); },
           [this] {
-              if (tokenMatches({"("})) {
-                  token++;
+              if (match({TokenType::LPAREN})) {
+                  consume({TokenType::LPAREN});
                   compileExpression();
-                  readSymbol({')'});
+                  consume({TokenType::RPAREN});
                   return true;
               }
               return false;
           },
           [this] { return compileUnaryOp(); },
           [this] {
-              auto identTok = std::dynamic_pointer_cast<IdentifierToken>(*token);
-              if (identTok == nullptr) { return false; }
+              if (!match({TokenType::IDENTIFIER})) {
+                  return false;
+              }
+              Token ident = consume({TokenType::IDENTIFIER});
 
-              const auto& next = std::next(token);
-              if ((*next)->valToString() == "." || (*next)->valToString() == "(") {
+              if (matchNext({TokenType::FULL_STOP, TokenType::LPAREN})) {
                   // TODO - do I need to pass in ident?
                   return compileSubroutineCall();
               }
 
-              const auto& ident = symbolTable.getSymbol(identTok->valToString());
-              auto segment = kindSegmentMap.at(ident->kind);
+              Symbol symbol = symbolTable.getSymbol(ident);
+              auto segment = kindSegmentMap.at(symbol.kind);
 
-              token++;
-              if (tokenMatches({"["})) {
-                  token++;
-                  vmWriter.writePush(segment, ident->id);
+              token++; // ??
+              if (match({TokenType::LBRACKET})) {
+                  consume({TokenType::LBRACKET});
+                  vmWriter.writePush(segment, symbol.id);
                   compileExpression();
-                  readSymbol({']'});
+                  consume({TokenType::RBRACKET});
                   vmWriter.write("add");
                   vmWriter.writePop(Segment::POINTER, 1);
                   vmWriter.writePush(Segment::THAT, 0);
@@ -470,15 +479,14 @@ bool CompilationEngine::compileTerm()
                   return true;
               }
 
-              vmWriter.writePush(segment, ident->id);
+              vmWriter.writePush(segment, symbol.id);
               return true;
           });
 
     return true;
 };
 
-bool CompilationEngine::compileSubroutineCall()
-{
+bool CompilationEngine::compileSubroutineCall() {
     // subroutineName '(' expressionList ')' | (className | varName)
     // '.' subroutineName '(' expressionList ')'
 
@@ -487,52 +495,50 @@ bool CompilationEngine::compileSubroutineCall()
     int numArgs = 0;
 
     // TODO increment num args correctly throughout
-    auto next = std::next(token);
-    if ((*next)->valToString() == ".") {
-        const auto& ident = readIdentifier();
-        readSymbol({'.'});
+    if (matchNext({TokenType::FULL_STOP})) {
+        Token ident = consume({TokenType::IDENTIFIER});
+        consume({TokenType::FULL_STOP});
 
-        auto symbol = symbolTable.getSymbol(ident->valToString());
+        Symbol symbol = symbolTable.getSymbol(ident);
 
         if (symbol.get() == nullptr) {
             // it's a class
-            typeName = ident->valToString();
+            typeName = ident.src;
         } else {
-            typeName = symbol->type;
-            auto segment = kindSegmentMap.at(symbol->kind);
+            typeName = symbol.type;
+            auto segment = kindSegmentMap.at(symbol.kind);
             numArgs += 1;
-            vmWriter.writePush(segment, symbol->id);
+            vmWriter.writePush(segment, symbol.id);
         }
-        const auto& methodName = readIdentifier();
-        name = typeName + "." + methodName->valToString();
+        Token methodName = consume({TokenType::IDENTIFIER});
+        name = typeName + "." + methodName.src;
 
     } else {
-        const auto& ident = readIdentifier();
+        Token ident = consume({TokenType::IDENTIFIER});
         numArgs = 1;
         vmWriter.writePush(Segment::POINTER, 0);
-        name = className + "." + ident->valToString();
+        name = className + "." + ident.src;
     }
 
-    readSymbol({'('});
-    if (!tokenMatches({")"})) {
+    consume({TokenType::LPAREN});
+    if (!match({TokenType::RPAREN})) {
         numArgs += compileExpressionList();
     }
 
-    readSymbol({')'});
+    consume({TokenType::RPAREN});
 
     vmWriter.writeCall(name, numArgs);
 
     return true;
 };
 
-int CompilationEngine::compileExpressionList()
-{
+int CompilationEngine::compileExpressionList() {
     // (expression (',' expression)* )?
 
     int numArgs = 0;
     compileExpression();
     numArgs++;
-    while (tokenMatches({","})) {
+    while (match({TokenType::COMMA})) {
         token++;
         compileExpression();
         numArgs++;
@@ -540,25 +546,25 @@ int CompilationEngine::compileExpressionList()
     return numArgs;
 };
 
-bool CompilationEngine::compileUnaryOp()
-{
+bool CompilationEngine::compileUnaryOp() {
     // '-' | '~' term
 
-    const auto& op = readSymbol({'~', '-'});
+    Token op = consume({TokenType::TILDE, TokenType::HYPHEN});
     compileTerm();
-    vmWriter.write(unaryOpCommandMap.at(op->getVal()));
+    vmWriter.write(unaryOpCommandMap.at(op.tokenType));
     return true;
 };
 
-bool CompilationEngine::compileKeywordConstant()
-{
+bool CompilationEngine::compileKeywordConstant() {
     // 'true'| 'false' | 'null' | 'this'
 
-    const auto& kw = readKeyword({"true", "false", "null", "this"});
-    if (kw->valToString() == "true") {
+    Token keyword = consume({TokenType::TRUE, TokenType::FALSE,
+                             TokenType::COMP_NULL, TokenType::THIS});
+    if (keyword.tokenType == TokenType::TRUE) {
         vmWriter.writePush(Segment::CONST, 1);
         vmWriter.write("neg");
-    } else if (kw->valToString() == "false" || kw->valToString() == "null") {
+    } else if (keyword.tokenType == TokenType::FALSE ||
+               keyword.tokenType == TokenType::COMP_NULL) {
         vmWriter.writePush(Segment::CONST, 0);
     } else {
         vmWriter.writePush(Segment::POINTER, 0);
@@ -566,31 +572,21 @@ bool CompilationEngine::compileKeywordConstant()
     return true;
 };
 
-bool CompilationEngine::compileIntConst()
-{
-    const auto intTok = std::dynamic_pointer_cast<IntConstToken>(*token);
-    if (intTok == nullptr) {
-        throw CompilationError(expected("intConst", *token));
-    }
+bool CompilationEngine::compileIntConst() {
+    Token intToken = consume({TokenType::INTEGER});
 
-    vmWriter.writePush(Segment::CONST, std::stoi(intTok->valToString()));
-
-    token++;
+    vmWriter.writePush(Segment::CONST, std::stoi(intToken.src));
 
     return true;
 };
 
-bool CompilationEngine::compileStringConst()
-{
-    auto strTok = std::dynamic_pointer_cast<StringToken>(*token);
-    if (strTok == nullptr) {
-        throw CompilationError(expected("stringConst", *token));
-    }
+bool CompilationEngine::compileStringConst() {
+    Token strToken = consume({TokenType::STRING});
 
-    auto string = strTok->getVal();
+    auto string = strToken.src;
     vmWriter.writePush(Segment::CONST, string.length());
     vmWriter.writeCall("String.new", 1);
-    for (const char& c : string) {
+    for (const char &c : string) {
         vmWriter.writePush(Segment::CONST, int(c));
         vmWriter.writeCall("String.appendChar", 2);
     }
@@ -602,94 +598,69 @@ bool CompilationEngine::compileStringConst()
 // Private helper methods
 // ======================
 
-std::shared_ptr<Token> CompilationEngine::readType()
-{
+Token CompilationEngine::readType() {
     // 'int' | 'char' | 'boolean' | className
 
     return oneOfToken(
-                      [this] { return readKeyword({"int", "char", "boolean"}); },
-                      [this] { return readIdentifier(); }
-                      );
+        [this] {
+            return consume(
+                {TokenType::INT, TokenType::CHAR, TokenType::BOOLEAN});
+        },
+        [this] { return consume({TokenType::IDENTIFIER}); });
 };
 
-std::shared_ptr<KeywordToken> CompilationEngine::readKeyword(const std::vector<std::string>& options)
-{
-    auto kwToken = std::dynamic_pointer_cast<KeywordToken>(*token);
-    if (kwToken == nullptr) {
-        throw CompilationError(expected("keyword", *token));
-    }
+Token CompilationEngine::consume(MatchOptions options) {
+    Token curr = *token;
 
-    for (auto& option : options) {
-        if(kwToken->getVal() == option) {
+    for (const TokenType &option : options) {
+        if (curr.tokenType == option) {
             token++;
-            return kwToken;
+            return curr;
         }
     }
 
-    throw CompilationError(expected("keyword", *token));
+    throw CompilationError(expected(options, *token));
 };
 
-std::shared_ptr<IdentifierToken> CompilationEngine::readIdentifier()
-{
-    auto identToken = std::dynamic_pointer_cast<IdentifierToken>(*token);
-    if (identToken == nullptr) {
-        throw CompilationError(expected("identifier", *token));
-    }
-
-    token++;
-    return identToken;
+bool CompilationEngine::match(MatchOptions options) {
+    return std::find(std::begin(options), std::end(options),
+                     (*token).tokenType) != std::end(options);
 };
 
-std::shared_ptr<SymbolToken> CompilationEngine::readSymbol(const std::vector<char16_t>& options)
-{
-    auto symbolToken = std::dynamic_pointer_cast<SymbolToken>(*token);
-    if (symbolToken == nullptr) {
-        throw CompilationError(expected("symbol", *token));
-    }
-
-    for (auto& option : options) {
-        if (symbolToken->getVal() == option) {
-            token++;
-            return symbolToken;
-        }
-    }
-
-    throw CompilationError(expected("symbol", *token));
+bool CompilationEngine::matchNext(MatchOptions options) {
+    auto next = std::next(token);
+    return std::find(std::begin(options), std::end(options),
+                     (*next).tokenType) != std::end(options);
 };
 
-bool CompilationEngine::tokenMatches(std::vector<std::string> options)
-{
-    return std::find(std::begin(options), std::end(options), (*token)->valToString()) != std::end(options);
-};
-
-bool CompilationEngine::zeroOrOnce(const std::function<void(void)>& F)
-{
+bool CompilationEngine::zeroOrOnce(const std::function<void(void)> &F) {
     try {
         F();
         return true;
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         return false;
     }
 };
 
-bool CompilationEngine::zeroOrMany(const std::function<bool(void)>& F)
-{
+bool CompilationEngine::zeroOrMany(const std::function<bool(void)> &F) {
     try {
-        while(F()) { }
+        while (F()) {
+        }
         return true;
-    } catch (const CompilationError& e) {
+    } catch (const CompilationError &e) {
         return false;
     }
 };
 
-const std::string CompilationEngine::expected(const std::string& expect, const std::shared_ptr<Token>& got)
-{
+const std::string CompilationEngine::expected(MatchOptions options,
+                                              const Token &got) {
+    // TODO: stringify options
     std::stringstream ss{};
-    ss << "l" << got->getLineNumber() << ": expected " << expect << ", received '" << got->valToString() << "'" << std::endl;
+    ss << "l" << got.lineNumber << ": expected " << expect << ", received '"
+       << got.src << "'" << std::endl;
     return ss.str();
 };
 
-const std::string CompilationEngine::newLabel()
-{
+const std::string CompilationEngine::newLabel() {
     return className + ".label." + std::to_string(labelCount++);
 };

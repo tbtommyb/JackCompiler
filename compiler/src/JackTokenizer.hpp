@@ -1,60 +1,85 @@
 #ifndef __JackTokenizer__
 #define __JackTokenizer__
 
-#include "Tokens.hpp"
+#include "CompilationError.hpp"
+#include "Token.hpp"
+#include "TokenType.hpp"
 #include <iostream>
 #include <istream>
+#include <iterator>
 #include <map>
+#include <regex>
 #include <sstream>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
-enum class Keyword {
-    CLASS,
-    CONSTRUCTOR,
-    FUNCTION,
-    METHOD,
-    FIELD,
-    STATIC,
-    VAR,
-    INT,
-    CHAR,
-    BOOLEAN,
-    VOID,
-    COMP_TRUE,
-    COMP_FALSE,
-    NULL_VAL,
-    THIS,
-    LET,
-    DO,
-    IF,
-    ELSE,
-    WHILE,
-    RETURN
-};
+using TokenList = std::vector<Token>;
 
-using TokenList = std::vector<std::shared_ptr<Token>>;
+// clang-format off
+const std::map<std::string, TokenType> tokenMap = {
+    {"boolean", TokenType::BOOLEAN},
+    {"char", TokenType::CHAR},
+    {"class", TokenType::CLASS},
+    {"constructor", TokenType::CONSTRUCTOR},
+    {"do", TokenType::DO},
+    {"else", TokenType::ELSE},
+    {"false", TokenType::FALSE},
+    {"field", TokenType::FIELD},
+    {"function", TokenType::FUNCTION},
+    {"if", TokenType::IF},
+    {"int", TokenType::INT},
+    {"let", TokenType::LET},
+    {"method", TokenType::NOT},
+    {"null", TokenType::COMP_NULL},
+    {"return", TokenType::RETURN},
+    {"static", TokenType::STATIC},
+    {"this", TokenType::THIS},
+    {"true", TokenType::TRUE},
+    {"var", TokenType::VAR},
+    {"void", TokenType::VOID},
+    {"while", TokenType::WHILE},
+    {",", TokenType::COMMA},
+    {"=", TokenType::EQUALS},
+    {".", TokenType::FULL_STOP},
+    {"-", TokenType::HYPHEN},
+    {"{", TokenType::LBRACE},
+    {"}", TokenType::RBRACE},
+    {"(", TokenType::LPAREN},
+    {")", TokenType::RPAREN},
+    {"[", TokenType::LBRACKET},
+    {"]", TokenType::RBRACKET},
+    {";", TokenType::SEMICOLON},
+    {"~", TokenType::TILDE},
+    {"+", TokenType::PLUS},
+    {"*", TokenType::STAR},
+    {"/", TokenType::FORWARD_SLASH},
+    {"&", TokenType::AMPERSAND},
+    {"|", TokenType::BAR},
+    {"<", TokenType::LESS_THAN},
+    {">", TokenType::GREATER_THAN}
+};
+// clang-format on
 
 class JackTokenizer {
   public:
     explicit JackTokenizer(std::istream &);
-    std::vector<std::shared_ptr<Token>> getTokenList();
+    TokenList tokenize();
 
   private:
-    bool isRemainingChar(std::string::iterator &);
-    bool isCommentLine(std::string::iterator &);
-    void skipCommentBlock(std::string::iterator &);
-    std::shared_ptr<Token> nextToken(const std::string &);
-    bool isKeyword(const std::string &);
-    bool isSymbol(char16_t);
+    std::string scan();
+    Token toToken(const std::string &);
+    bool moreCharsRemain();
+    void skipCommentBlock();
+    char advance();
+    char peek();
+    char peekNext();
     bool isInteger(const std::string &);
     bool isString(const std::string &);
     bool isIdentifier(const std::string &);
-    std::istream &input;
-    std::string currentLine;
+    std::istream_iterator it;
+    std::istream_iterator end;
     int lineNumber;
-    bool multilineCommentBlock;
+    TokenList tokens;
 };
 
 #endif

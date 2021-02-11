@@ -1,196 +1,127 @@
-#include <regex>
 #include "JackTokenizer.hpp"
 
-std::map<std::string, Keyword> validKeywords = {
-    { "class",       Keyword::CLASS },
-    { "constructor", Keyword::CONSTRUCTOR },
-    { "function",    Keyword::FUNCTION },
-    { "method",      Keyword::METHOD },
-    { "field",       Keyword::FIELD },
-    { "static",      Keyword::STATIC },
-    { "var",         Keyword::VAR },
-    { "int",         Keyword::INT },
-    { "char",        Keyword::CHAR },
-    { "boolean",     Keyword::BOOLEAN },
-    { "void",        Keyword::VOID },
-    { "true",        Keyword::COMP_TRUE },
-    { "false",       Keyword::COMP_FALSE },
-    { "null",        Keyword::NULL_VAL },
-    { "this",        Keyword::THIS },
-    { "let",         Keyword::LET },
-    { "do",          Keyword::DO },
-    { "if",          Keyword::IF },
-    { "else",        Keyword::ELSE },
-    { "while",       Keyword::WHILE },
-    { "return",      Keyword::RETURN },
-};
+JackTokenizer::JackTokenizer(std::istream &in)
+    : it{in}, end{it.end()}, lineNumber{1} {};
 
-std::unordered_set<char16_t> validSymbols = {
-    '{',
-    '}',
-    '(',
-    ')',
-    '[',
-    ']',
-    '.',
-    ',',
-    ';',
-    '+',
-    '-',
-    '*',
-    '/',
-    '&',
-    '|',
-    '<',
-    '>',
-    '=',
-    '~',
-};
-
-JackTokenizer::JackTokenizer(std::istream& in) : input(in), lineNumber(0), multilineCommentBlock(false) { };
-
-bool JackTokenizer::isCommentLine(std::string::iterator& it)
-{
-    if (multilineCommentBlock) {
-        return currentLine.find("*/") == std::string::npos;
-    }
-    return *it == '/' && *std::next(it) == '/';
-};
-
-void JackTokenizer::skipCommentBlock(std::string::iterator& it)
-{
-    if (multilineCommentBlock) {
-        while (!(*it == '*' && *std::next(it) == '/')) {
-            it++;
+TokenList JackTokenizer::tokenize() {
+    while (moreCharsRemain()) {
+        std::string lexeme = scan();
+        if (!lexeme.empty()) {
+            tokens.push_back(toToken(lexeme));
         }
-        multilineCommentBlock = false;
-        std::advance(it, 2);
     }
 
-    if (!(*it == '/' && *std::next(it) == '*')) {
+    tokens.push_back(Token{TokenType::COMP_EOF, "", lineNumber});
+
+    return tokens;
+};
+
+bool JackTokenizer::moreCharsRemain() {
+    while (isspace(peek())) {
+        advance();
+    }
+
+    skipCommentBlock();
+
+    return it != end;
+};
+
+std::string JackTokenizer::scan() {
+    std::string lexeme;
+    char c;
+
+    do {
+        c = advance();
+        lexeme += c;
+    } while (isalnum(c));
+
+    if (lexeme[0] == '\n') {
+        lineNumber++;
+        return "";
+    }
+    if (lexeme[0] == '\"') {
+        while (peek() != '\"') {
+            if (peek() == '\n') {
+                lineNumber++;
+            }
+            lexeme += advance();
+        }
+        lexeme += advance(); // add the second "
+    }
+
+    return lexeme;
+}
+
+void JackTokenizer::skipCommentBlock() {
+    if (peek() == '/' && peekNext() == '/') {
+        std::advance(it, 2);
+        while (peek() != '\n') {
+            advance();
+        }
+    }
+
+    if (!(peek() == '/' && peekNext() == '*')) {
         return;
     }
 
     std::advance(it, 2);
 
-    while (!(*it == '*' && *std::next(it) == '/')) {
-        it++;
-        if (it == currentLine.end()) {
-            multilineCommentBlock = true;
-            return;
-        }
+    while (!(peek() == '*' && peekNext() == '/')) {
+        advance();
     }
 
     std::advance(it, 2);
 };
 
-bool JackTokenizer::isRemainingChar(std::string::iterator& it)
-{
-    while (isspace(*it)) {
-        it++;
-    }
-
-    if (isCommentLine(it)) {
-        return false;
-    }
-
-    skipCommentBlock(it);
-
-    if (it == currentLine.end()) {
-        return false;
-    }
-
-    return true;
+char JackTokenizer::advance() {
+    return *it++; // increment, return prev
 };
 
-TokenList JackTokenizer::getTokenList()
-{
-    TokenList tokenList{};
-    std::string currentEl;
-    while(std::getline(input, currentLine)) {
-        lineNumber++;
-        std::string::iterator it = currentLine.begin();
-        while(isRemainingChar(it)) {
-            std::string token{};
-            if (isSymbol(*it)) {
-                token.append(1, *it++);
-            } else {
-                // handle string constants
-                if (*it == '\"') {
-                    token.append(1, *it++);
-                    while (it != currentLine.end() && *it != '\"') {
-                        token.append(1, *it++);
-                    }
+char JackTokenizer::peek() { return *it; }
+char JackTokenizer::peekNext() { return *(std::next(it)); }
 
-                    token.append(1, *it++);
-                } else {
-                    while (it != currentLine.end() && !isspace(*it) && !isSymbol(*it)) {
-                        token.append(1, *it++);
-                    }
-                }
-            }
-            tokenList.push_back(nextToken(token));
-        }
+Token JackTokenizer::toToken(const std::string &input) {
+    TokenType tokenType;
+
+    auto token = tokenMap.find(input);
+    if (token != tokenMap.end()) {
+        tokenType = token->second;
+    } else if (isInteger(input)) {
+        tokenType = TokenType::INTEGER;
+    } else if (isString(input)) {
+        // Strip double quotes
+        return Token{TokenType::STRING, input.substr(1, input.size() - 2),
+                     lineNumber};
+    } else if (isIdentifier(input)) {
+        tokenType = TokenType::IDENTIFIER;
+    } else {
+        throw new CompilationError{"Cannot tokenize " + input};
     }
 
-    return tokenList;
+    return Token{tokenType, input, lineNumber};
 };
 
-std::shared_ptr<Token> JackTokenizer::nextToken(const std::string& input)
-{
-    if (isKeyword(input)) {
-        return std::make_shared<KeywordToken>(input, lineNumber);
-    }
-    if (isSymbol(input.c_str()[0])) {
-        auto symbol = input.c_str()[0];
-        return std::make_shared<SymbolToken>(symbol, lineNumber);
-    }
-    if (isInteger(input)) {
-        return std::make_shared<IntConstToken>(std::stoi(input), lineNumber);
-    }
-    if (isString(input)) {
-        // strip double quotes
-        const auto& str = input.substr(1, input.size() - 2);
-        return std::make_shared<StringToken>(str, lineNumber);
-    }
-    if (isIdentifier(input)) {
-        return std::make_shared<IdentifierToken>(input, lineNumber);
-    }
-    return std::make_shared<Token>(lineNumber);
-};
-
-bool JackTokenizer::isKeyword(const std::string& input)
-{
-    return validKeywords.count(input);
-};
-
-bool JackTokenizer::isSymbol(char16_t input)
-{
-    return validSymbols.find(input) != validSymbols.end();
-};
-
-bool JackTokenizer::isInteger(const std::string& input)
-{
+bool JackTokenizer::isInteger(const std::string &input) {
     std::string::const_iterator it = input.begin();
 
-    while (it != input.end() && isdigit(*it)) {++it; }
+    while (it != input.end() && isdigit(*it)) {
+        ++it;
+    }
 
     if (it == input.end() && input.length() > 0) {
         int num = std::stoi(input);
-        return num >= 0 && num <= 32767;
+        return num >= 0 && num <= 32767; // TODO: why this?
     }
 
     return false;
 };
 
-bool JackTokenizer::isString(const std::string& input)
-{
+bool JackTokenizer::isString(const std::string &input) {
     const std::regex pattern{R"(^\"[[:print:]]+\"$)"};
     return std::regex_match(input, pattern);
 };
 
-bool JackTokenizer::isIdentifier(const std::string& input)
-{
+bool JackTokenizer::isIdentifier(const std::string &input) {
     const std::regex pattern{R"(^[a-zA-Z_]+[a-zA-Z0-9_]*)"};
     return std::regex_match(input, pattern);
 };

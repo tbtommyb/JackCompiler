@@ -5,7 +5,8 @@
 #include <sstream>
 #include <string>
 
-#include "Tokens.hpp"
+#include "CompilationError.hpp"
+#include "Token.hpp"
 
 struct SymbolKind {
     enum Enum { NONE, STATIC, FIELD, ARGUMENT, VAR };
@@ -38,13 +39,11 @@ class SymbolTable {
     SymbolTable() = default;
     ~SymbolTable() = default;
     void startSubroutine();
-    Symbol addSymbol(std::shared_ptr<Token> name, std::shared_ptr<Token> type,
-                     std::shared_ptr<Token> kind);
-    Symbol addSymbol(std::shared_ptr<Token> name, std::shared_ptr<Token> type,
-                     const SymbolKind::Enum &kind);
+    Symbol addSymbol(Token name, Token type, Token kind);
+    Symbol addSymbol(Token name, Token type, const SymbolKind::Enum &kind);
     Symbol addSymbol(const std::string &name, const std::string &type,
                      const SymbolKind::Enum &kind);
-    std::shared_ptr<Symbol> getSymbol(const std::string &name);
+    Symbol getSymbol(Token name);
     int getCount(const SymbolKind::Enum &kind);
 
   private:

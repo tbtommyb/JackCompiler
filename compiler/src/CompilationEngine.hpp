@@ -4,10 +4,13 @@
 #include "CompilationError.hpp"
 #include "JackTokenizer.hpp"
 #include "SymbolTable.hpp"
-#include "Tokens.hpp"
+#include "Token.hpp"
+#include "TokenType.hpp"
 #include "VMWriter.hpp"
 #include <iostream>
 #include <string>
+
+using MatchOptions = const std::vector<TokenType>&;
 
 class CompilationEngine {
   public:
@@ -19,8 +22,7 @@ class CompilationEngine {
     bool compileSubroutineDec();
     bool compileParameterList();
     bool compileVarDec();
-    bool compileSubroutineBody(std::shared_ptr<Token> name,
-                               std::shared_ptr<Token> kw);
+    bool compileSubroutineBody(Token name, Token keyword);
     bool compileStatements();
     bool compileStatement();
     bool compileLet();
@@ -38,19 +40,15 @@ class CompilationEngine {
     bool compileStringConst();
 
   private:
-    std::shared_ptr<Token> readType();
-    std::shared_ptr<KeywordToken>
-    readKeyword(const std::vector<std::string> &options);
-    std::shared_ptr<IdentifierToken> readIdentifier();
-    std::shared_ptr<SymbolToken>
-    readSymbol(const std::vector<char16_t> &options);
-    bool tokenMatches(std::vector<std::string>);
+    Token consume(MatchOptions);
+    bool match(MatchOptions);
+    bool matchNext(MatchOptions);
+    Token readType();
     bool zeroOrOnce(const std::function<void(void)> &);
     bool zeroOrMany(const std::function<bool(void)> &);
-    const std::string expected(const std::string &,
-                               const std::shared_ptr<Token> &);
+    const std::string expected(MatchOptions, const Token &);
     const std::string newLabel();
-    std::vector<std::shared_ptr<Token>>::iterator token;
+    TokenList::iterator token;
     VMWriter vmWriter;
     std::string className;
     SymbolTable symbolTable;
