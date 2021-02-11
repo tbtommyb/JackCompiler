@@ -63,7 +63,7 @@ MatchOptions ops = {
     TokenType::LESS_THAN,     TokenType::GREATER_THAN, TokenType::EQUALS};
 
 CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
-    : token{tokens.begin()}, vmWriter{out}, labelCount{0}, symbolTable{} {}
+    : token{tokens.begin()}, vmWriter{out}, symbolTable{}, labelCount{0} {}
 
 // Public compilation methods
 // ==========================
@@ -424,7 +424,7 @@ bool CompilationEngine::compileExpression() {
         if (match(ops)) {
             Token op = consume(ops);
             compileTerm();
-            vmWriter.write(opCommandMap.at(op));
+            vmWriter.write(opCommandMap.at(op.tokenType));
             // token++;
             return true;
         }
@@ -499,17 +499,17 @@ bool CompilationEngine::compileSubroutineCall() {
         Token ident = consume({TokenType::IDENTIFIER});
         consume({TokenType::FULL_STOP});
 
-        Symbol symbol = symbolTable.getSymbol(ident);
-
-        if (symbol.get() == nullptr) {
-            // it's a class
-            typeName = ident.src;
-        } else {
+        try {
+            Symbol symbol = symbolTable.getSymbol(ident);
             typeName = symbol.type;
             auto segment = kindSegmentMap.at(symbol.kind);
             numArgs += 1;
             vmWriter.writePush(segment, symbol.id);
+        } catch (CompilationError e) {
+            // it's a class
+            typeName = ident.src;
         }
+
         Token methodName = consume({TokenType::IDENTIFIER});
         name = typeName + "." + methodName.src;
 
@@ -558,12 +558,12 @@ bool CompilationEngine::compileUnaryOp() {
 bool CompilationEngine::compileKeywordConstant() {
     // 'true'| 'false' | 'null' | 'this'
 
-    Token keyword = consume({TokenType::TRUE, TokenType::FALSE,
+    Token keyword = consume({TokenType::COMP_TRUE, TokenType::COMP_FALSE,
                              TokenType::COMP_NULL, TokenType::THIS});
-    if (keyword.tokenType == TokenType::TRUE) {
+    if (keyword.tokenType == TokenType::COMP_TRUE) {
         vmWriter.writePush(Segment::CONST, 1);
         vmWriter.write("neg");
-    } else if (keyword.tokenType == TokenType::FALSE ||
+    } else if (keyword.tokenType == TokenType::COMP_FALSE ||
                keyword.tokenType == TokenType::COMP_NULL) {
         vmWriter.writePush(Segment::CONST, 0);
     } else {
@@ -656,8 +656,9 @@ const std::string CompilationEngine::expected(MatchOptions options,
                                               const Token &got) {
     // TODO: stringify options
     std::stringstream ss{};
-    ss << "l" << got.lineNumber << ": expected " << expect << ", received '"
-       << got.src << "'" << std::endl;
+    ss << "l" << got.lineNumber << ": expected "
+       << "opts"
+       << ", received '" << got.src << "'" << std::endl;
     return ss.str();
 };
 

@@ -28,7 +28,7 @@ void Compiler::run(std::string dir) {
 
 void Compiler::process(std::istream &program, std::ostream &out) {
     JackTokenizer tokenizer{program};
-    auto tokens = tokenizer.getTokenList();
+    TokenList tokens = tokenizer.tokenize();
 
     CompilationEngine compiler{tokens, out};
     compiler.compile();

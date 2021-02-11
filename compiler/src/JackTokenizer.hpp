@@ -23,7 +23,7 @@ const std::map<std::string, TokenType> tokenMap = {
     {"constructor", TokenType::CONSTRUCTOR},
     {"do", TokenType::DO},
     {"else", TokenType::ELSE},
-    {"false", TokenType::FALSE},
+    {"false", TokenType::COMP_FALSE},
     {"field", TokenType::FIELD},
     {"function", TokenType::FUNCTION},
     {"if", TokenType::IF},
@@ -34,7 +34,7 @@ const std::map<std::string, TokenType> tokenMap = {
     {"return", TokenType::RETURN},
     {"static", TokenType::STATIC},
     {"this", TokenType::THIS},
-    {"true", TokenType::TRUE},
+    {"true", TokenType::COMP_TRUE},
     {"var", TokenType::VAR},
     {"void", TokenType::VOID},
     {"while", TokenType::WHILE},
@@ -76,8 +76,8 @@ class JackTokenizer {
     bool isInteger(const std::string &);
     bool isString(const std::string &);
     bool isIdentifier(const std::string &);
-    std::istream_iterator it;
-    std::istream_iterator end;
+    std::istream_iterator<char> it;
+    std::istream_iterator<char> end;
     int lineNumber;
     TokenList tokens;
 };

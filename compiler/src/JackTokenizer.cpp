@@ -1,7 +1,7 @@
 #include "JackTokenizer.hpp"
 
 JackTokenizer::JackTokenizer(std::istream &in)
-    : it{in}, end{it.end()}, lineNumber{1} {};
+    : it{in}, end{}, lineNumber{1} {};
 
 TokenList JackTokenizer::tokenize() {
     while (moreCharsRemain()) {
