@@ -31,13 +31,14 @@ class CompilationEngine {
     bool compileDo();
     bool compileReturn();
     bool compileExpression();
-    bool compileTerm();
+    void compileTerm();
     bool compileSubroutineCall();
     int compileExpressionList();
     bool compileUnaryOp();
     bool compileKeywordConstant();
     bool compileIntConst();
     bool compileStringConst();
+    void compileArrayLiteral(Segment::Enum, Symbol);
 
   private:
     Token consume(MatchOptions);
@@ -46,7 +47,7 @@ class CompilationEngine {
     Token readType();
     bool zeroOrOnce(const std::function<void(void)> &);
     bool zeroOrMany(const std::function<bool(void)> &);
-    const std::string expected(MatchOptions, const Token &);
+    const std::string expected(std::string);
     const std::string newLabel();
     TokenList::iterator token;
     VMWriter vmWriter;

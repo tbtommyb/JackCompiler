@@ -8,6 +8,15 @@
 #include "CompilationError.hpp"
 #include "Token.hpp"
 
+class SymbolNotFoundError : public std::exception {
+  public:
+    SymbolNotFoundError(std::string msg) : msg(msg.c_str()) {}
+    [[nodiscard]] const char *what() const noexcept override { return msg; }
+
+  private:
+    const char *msg;
+};
+
 struct SymbolKind {
     enum Enum { NONE, STATIC, FIELD, ARGUMENT, VAR };
     static std::string toString(const SymbolKind::Enum &kind) {

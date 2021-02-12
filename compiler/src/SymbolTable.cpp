@@ -71,7 +71,7 @@ Symbol SymbolTable::getSymbol(Token name) {
     if (cIter != classMap.end()) {
         return srIter->second;
     }
-    throw CompilationError{"Symbol " + name.src + " not found"};
+    throw SymbolNotFoundError{name.src};
 };
 
 int SymbolTable::getCount(const SymbolKind::Enum &kind) {
