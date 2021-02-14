@@ -38,7 +38,11 @@ CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
 // ==========================
 
 void CompilationEngine::compile() {
-    compileClass();
+    try {
+        compileClass();
+    } catch (const SymbolNotFoundError &e) {
+        throw CompilationError{e.what()};
+    }
 };
 
 void CompilationEngine::compileClass() {

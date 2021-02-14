@@ -45,9 +45,5 @@ bool Compiler::process(const std::string &inputPath, std::istream &program,
         std::cerr << "Compilation error in " << inputPath << ":\n"
                   << e.what() << std::endl;
         return false;
-    } catch (const SymbolNotFoundError &e) {
-        std::cerr << "Compilation error in " << inputPath << ":\n"
-                  << e.what() << std::endl;
-        return false;
     }
 };
