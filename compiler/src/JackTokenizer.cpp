@@ -54,7 +54,6 @@ void JackTokenizer::skipCommentBlock() {
         while (peek() != '\n') {
             advance();
         }
-        // lineNumber++;
     }
 
     if (!(peek() == '/' && peekNext() == '*')) {
@@ -102,7 +101,10 @@ Token JackTokenizer::toToken(const std::string &input) {
     } else if (isIdentifier(input)) {
         tokenType = TokenType::IDENTIFIER;
     } else {
-        throw CompilationError{"Cannot tokenize " + input};
+        std::stringstream ss{};
+        ss << "Line " << lineNumber << ": cannot tokenize '" << input << "'"
+           << std::endl;
+        throw CompilationError{ss.str()};
     }
 
     return Token{tokenType, input, lineNumber};
