@@ -18,18 +18,24 @@ void Compiler::run(std::string dir) {
 
     for (const auto &filePath : filesToProcess) {
         std::ifstream file{filePath.string()};
-        std::ofstream outputFile{filePath.stem().string() + ".vm"};
-
         assert(file.is_open());
-        assert(outputFile.is_open());
-        process(file, outputFile);
+
+        std::string outputPath = filePath.stem().string() + ".vm";
+        assert(fs::exists(outputPath));
+        std::ostringstream output{};
+
+        if (process(file, output)) {
+            std::ofstream outputFile{outputPath};
+            assert(outputFile.is_open());
+            outputFile << output.str() << std::endl;
+        }
     }
 };
 
-void Compiler::process(std::istream &program, std::ostream &out) {
+bool Compiler::process(std::istream &program, std::ostream &out) {
     JackTokenizer tokenizer{program};
     TokenList tokens = tokenizer.tokenize();
 
     CompilationEngine compiler{tokens, out};
-    compiler.compile();
+    return compiler.compile();
 };

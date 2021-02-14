@@ -36,15 +36,16 @@ CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
 // Public compilation methods
 // ==========================
 
-void CompilationEngine::compile() {
+bool CompilationEngine::compile() {
     try {
         compileClass();
+        return true;
     } catch (const CompilationError &e) {
         std::cerr << "Compilation error:\n" << e.what() << std::endl;
-        return;
+        return false;
     } catch (const SymbolNotFoundError &e) {
         std::cerr << "Compilation error:\n" << e.what() << std::endl;
-        return;
+        return false;
     }
 };
 

@@ -14,7 +14,7 @@ class Compiler {
     Compiler() = default;
     ~Compiler() = default;
     void run(std::string dir);
-    void process(std::istream &program, std::ostream &out);
+    bool process(std::istream &program, std::ostream &out);
 
   private:
     std::vector<fs::path> filesToProcess;
