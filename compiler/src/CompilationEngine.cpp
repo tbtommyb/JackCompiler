@@ -40,10 +40,10 @@ void CompilationEngine::compile() {
     try {
         compileClass();
     } catch (const CompilationError &e) {
-        std::cerr << "Compilation error: \n" << e.what() << std::endl;
+        std::cerr << "Compilation error:\n" << e.what() << std::endl;
         return;
     } catch (const SymbolNotFoundError &e) {
-        std::cerr << "Comp error: \n" << e.what() << std::endl;
+        std::cerr << "Compilation error:\n" << e.what() << std::endl;
         return;
     }
 };

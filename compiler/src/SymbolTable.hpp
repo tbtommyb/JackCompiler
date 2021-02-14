@@ -4,18 +4,14 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <stdexcept>
 
 #include "CompilationError.hpp"
 #include "Token.hpp"
 
-class SymbolNotFoundError : public std::exception {
+class SymbolNotFoundError : public std::runtime_error {
   public:
-    SymbolNotFoundError(const char *msg) : msg{msg} {}
-    SymbolNotFoundError(std::string msg) : SymbolNotFoundError{msg.c_str()} {}
-    [[nodiscard]] const char *what() const noexcept override { return msg; }
-
-  private:
-    const char *msg;
+    SymbolNotFoundError(std::string msg) : std::runtime_error{msg} {}
 };
 
 struct SymbolKind {

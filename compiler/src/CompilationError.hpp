@@ -1,17 +1,12 @@
 #ifndef __CompilationError__
 #define __CompilationError__
 
-#include <exception>
 #include <string>
+#include <stdexcept>
 
-class CompilationError : public std::exception {
+class CompilationError : public std::runtime_error {
   public:
-    CompilationError(const char *msg) : msg(msg) {}
-    CompilationError(std::string msg) : CompilationError(msg.c_str()) {}
-    [[nodiscard]] const char *what() const noexcept override { return msg; }
-
-  private:
-    const char *msg;
+    CompilationError(std::string msg) : std::runtime_error{msg} {}
 };
 
 #endif
