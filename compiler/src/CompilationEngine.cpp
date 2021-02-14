@@ -1,13 +1,13 @@
 #include "CompilationEngine.hpp"
 
-std::map<SymbolKind::Enum, Segment::Enum> kindSegmentMap = {
+const std::map<SymbolKind::Enum, Segment::Enum> kindSegmentMap = {
     {SymbolKind::STATIC, Segment::STATIC},
     {SymbolKind::FIELD, Segment::THIS},
     {SymbolKind::ARGUMENT, Segment::ARG},
     {SymbolKind::VAR, Segment::LOCAL},
 };
 
-std::map<TokenType, std::string> opCommandMap = {
+const std::map<TokenType, std::string> opCommandMap = {
     {TokenType::PLUS, "add"},
     {TokenType::HYPHEN, "sub"},
     {TokenType::STAR, "call Math.multiply 2"},
@@ -19,7 +19,7 @@ std::map<TokenType, std::string> opCommandMap = {
     {TokenType::BAR, "or"},
 };
 
-std::map<TokenType, std::string> unaryOpCommandMap = {
+const std::map<TokenType, std::string> unaryOpCommandMap = {
     {TokenType::HYPHEN, "neg"}, {TokenType::TILDE, "not"}};
 
 MatchOptions ops = {
@@ -36,18 +36,19 @@ CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
 // Public compilation methods
 // ==========================
 
-bool CompilationEngine::compile() {
+void CompilationEngine::compile() {
     try {
         compileClass();
     } catch (const CompilationError &e) {
-        std::cerr << "Compilation error: " << e.what() << std::endl;
-        return false;
+        std::cerr << "Compilation error: \n" << e.what() << std::endl;
+        return;
+    } catch (const SymbolNotFoundError &e) {
+        std::cerr << "Comp error: \n" << e.what() << std::endl;
+        return;
     }
-
-    return true;
 };
 
-bool CompilationEngine::compileClass() {
+void CompilationEngine::compileClass() {
     // 'class' className '{' classVarDec* subroutineDec* '}'
 
     consume({TokenType::CLASS});
@@ -64,11 +65,9 @@ bool CompilationEngine::compileClass() {
         {TokenType::CONSTRUCTOR, TokenType::FUNCTION, TokenType::METHOD})) {
         compileSubroutineDec();
     }
-
-    return true;
 };
 
-bool CompilationEngine::compileClassVarDec() {
+void CompilationEngine::compileClassVarDec() {
     // ('static' | 'field' ) type varName (',' varName)* ';'
 
     Token keyword = consume({TokenType::STATIC, TokenType::FIELD});
@@ -84,11 +83,9 @@ bool CompilationEngine::compileClassVarDec() {
     }
 
     consume({TokenType::SEMICOLON});
-
-    return true;
 };
 
-bool CompilationEngine::compileSubroutineDec() {
+void CompilationEngine::compileSubroutineDec() {
     // ('constructor' | 'function' | 'method')
     // ('void' | type) subroutineName '(' parameterList ')'
     // subroutineBody
@@ -110,28 +107,21 @@ bool CompilationEngine::compileSubroutineDec() {
     }
     Token ident = consume({TokenType::IDENTIFIER});
 
-    consume({TokenType::LPAREN});
     compileParameterList();
-    consume({TokenType::RPAREN});
 
     // TODO add type
     compileSubroutineBody(ident, keyword);
     vmWriter.write("// End subroutine");
-
-    return true;
 };
 
-bool CompilationEngine::compileParameterList() {
+void CompilationEngine::compileParameterList() {
     // ((type varName) (',' type varName)*)?
 
-    // TODO: this looks wrong
-    // if (!(match({TokenType::INT, TokenType::CHAR, TokenType::BOOLEAN,
-    //              TokenType::IDENTIFIER}))) {
-    //     return false;
-    // }
+    consume({TokenType::LPAREN});
 
     if (match({TokenType::RPAREN})) {
-        return true;
+        consume({TokenType::RPAREN});
+        return;
     }
 
     Token type = readType();
@@ -147,10 +137,10 @@ bool CompilationEngine::compileParameterList() {
         symbolTable.addSymbol(ident, type, SymbolKind::ARGUMENT);
     }
 
-    return true;
+    consume({TokenType::RPAREN});
 };
 
-bool CompilationEngine::compileVarDec() {
+void CompilationEngine::compileVarDec() {
     // 'var' type varName (',' varName)* ';'
 
     Token keyword = consume({TokenType::VAR});
@@ -166,11 +156,9 @@ bool CompilationEngine::compileVarDec() {
     }
 
     consume({TokenType::SEMICOLON});
-
-    return true;
 };
 
-bool CompilationEngine::compileSubroutineBody(Token name, Token keyword) {
+void CompilationEngine::compileSubroutineBody(Token name, Token keyword) {
     // '{' varDec* statements '}'
 
     vmWriter.write("// Compiling subroutine body");
@@ -198,23 +186,18 @@ bool CompilationEngine::compileSubroutineBody(Token name, Token keyword) {
 
     consume({TokenType::RBRACE});
     vmWriter.write("// End subroutine body");
-
-    return true;
 };
 
-bool CompilationEngine::compileStatements() {
+void CompilationEngine::compileStatements() {
     // statement*
 
-    // TODO logging semicolon so not incrementing token somewhere
     while (match({TokenType::LET, TokenType::IF, TokenType::ELSE,
                   TokenType::WHILE, TokenType::DO, TokenType::RETURN})) {
         compileStatement();
     }
-
-    return true;
 };
 
-bool CompilationEngine::compileStatement() {
+void CompilationEngine::compileStatement() {
     // letStatement | ifStatement | whileStatement | doStatement |
     // returnStatement
 
@@ -229,13 +212,13 @@ bool CompilationEngine::compileStatement() {
     } else if (match({TokenType::RETURN})) {
         compileReturn();
     } else {
-        throw CompilationError{expected("statement")};
+        throw CompilationError{
+            expected({TokenType::LET, TokenType::IF, TokenType::WHILE,
+                      TokenType::DO, TokenType::RETURN})};
     }
-
-    return true;
 };
 
-bool CompilationEngine::compileLet() {
+void CompilationEngine::compileLet() {
     // 'let' varName ('[' expression ']')? '=' expression ';'
 
     bool arrayAccess = false;
@@ -269,11 +252,9 @@ bool CompilationEngine::compileLet() {
     } else {
         vmWriter.writePop(segment, symbol.id);
     }
-
-    return true;
 };
 
-bool CompilationEngine::compileIf() {
+void CompilationEngine::compileIf() {
     // 'if '(' expression ')' '{' statements '}' ('else' '{' statements
     // '}')?
 
@@ -305,11 +286,9 @@ bool CompilationEngine::compileIf() {
     }
 
     vmWriter.writeLabel(endLabel);
-
-    return true;
 };
 
-bool CompilationEngine::compileWhile() {
+void CompilationEngine::compileWhile() {
     // 'while' '(' expression ')' '{' statements '}'
 
     vmWriter.write("// Compiling while");
@@ -331,11 +310,9 @@ bool CompilationEngine::compileWhile() {
 
     vmWriter.writeGoto(topLabel);
     vmWriter.writeLabel(notLabel);
-
-    return true;
 };
 
-bool CompilationEngine::compileDo() {
+void CompilationEngine::compileDo() {
     // 'do' subroutineCall ';'
 
     vmWriter.write("// Compiling do");
@@ -345,11 +322,9 @@ bool CompilationEngine::compileDo() {
 
     consume({TokenType::SEMICOLON});
     vmWriter.writePop(Segment::TEMP, 0);
-
-    return true;
 };
 
-bool CompilationEngine::compileReturn() {
+void CompilationEngine::compileReturn() {
     // 'return' expression? ';'
 
     vmWriter.write("// Compiling return");
@@ -364,11 +339,9 @@ bool CompilationEngine::compileReturn() {
     vmWriter.writeReturn();
 
     consume({TokenType::SEMICOLON});
-
-    return true;
 };
 
-bool CompilationEngine::compileExpression() {
+void CompilationEngine::compileExpression() {
     // term (op term)*
 
     compileTerm();
@@ -377,10 +350,7 @@ bool CompilationEngine::compileExpression() {
         Token op = consume(ops);
         compileTerm();
         vmWriter.write(opCommandMap.at(op.tokenType));
-        // token++;
     }
-
-    return true;
 };
 
 void CompilationEngine::compileTerm() {
@@ -401,24 +371,31 @@ void CompilationEngine::compileTerm() {
     } else if (match({TokenType::TILDE, TokenType::HYPHEN})) {
         compileUnaryOp();
     } else if (match({TokenType::IDENTIFIER})) {
-        if (matchNext({TokenType::FULL_STOP, TokenType::LPAREN})) {
-            compileSubroutineCall();
-            return;
-        }
-        Token ident = consume({TokenType::IDENTIFIER});
-        Symbol symbol = symbolTable.getSymbol(ident);
-        auto segment = kindSegmentMap.at(symbol.kind);
-        if (match({TokenType::LBRACKET})) {
-            compileArrayLiteral(segment, symbol);
-            return;
-        }
-        vmWriter.writePush(segment, symbol.id);
+        compileIdentifier();
     } else {
-        throw CompilationError{expected("term")};
+        throw CompilationError{expected(
+            {TokenType::INTEGER, TokenType::STRING, TokenType::LPAREN,
+             TokenType::TILDE, TokenType::HYPHEN, TokenType::IDENTIFIER})};
     }
 };
 
-bool CompilationEngine::compileSubroutineCall() {
+void CompilationEngine::compileIdentifier() {
+    if (matchNext({TokenType::FULL_STOP, TokenType::LPAREN})) {
+        compileSubroutineCall();
+        return;
+    }
+    Token ident = consume({TokenType::IDENTIFIER});
+
+    Symbol symbol = symbolTable.getSymbol(ident);
+    auto segment = kindSegmentMap.at(symbol.kind);
+    if (match({TokenType::LBRACKET})) {
+        compileArrayLiteral(segment, symbol);
+        return;
+    }
+    vmWriter.writePush(segment, symbol.id);
+};
+
+void CompilationEngine::compileSubroutineCall() {
     // subroutineName '(' expressionList ')' | (className | varName)
     // '.' subroutineName '(' expressionList ')'
 
@@ -459,8 +436,6 @@ bool CompilationEngine::compileSubroutineCall() {
     consume({TokenType::RPAREN});
 
     vmWriter.writeCall(name, numArgs);
-
-    return true;
 };
 
 int CompilationEngine::compileExpressionList() {
@@ -477,16 +452,15 @@ int CompilationEngine::compileExpressionList() {
     return numArgs;
 };
 
-bool CompilationEngine::compileUnaryOp() {
+void CompilationEngine::compileUnaryOp() {
     // '-' | '~' term
 
     Token op = consume({TokenType::TILDE, TokenType::HYPHEN});
     compileTerm();
     vmWriter.write(unaryOpCommandMap.at(op.tokenType));
-    return true;
 };
 
-bool CompilationEngine::compileKeywordConstant() {
+void CompilationEngine::compileKeywordConstant() {
     // 'true'| 'false' | 'null' | 'this'
 
     Token keyword = consume(keywords);
@@ -499,18 +473,15 @@ bool CompilationEngine::compileKeywordConstant() {
     } else {
         vmWriter.writePush(Segment::POINTER, 0);
     }
-    return true;
 };
 
-bool CompilationEngine::compileIntConst() {
+void CompilationEngine::compileIntConst() {
     Token intToken = consume({TokenType::INTEGER});
 
     vmWriter.writePush(Segment::CONST, std::stoi(intToken.src));
-
-    return true;
 };
 
-bool CompilationEngine::compileStringConst() {
+void CompilationEngine::compileStringConst() {
     Token strToken = consume({TokenType::STRING});
 
     auto string = strToken.src;
@@ -520,8 +491,6 @@ bool CompilationEngine::compileStringConst() {
         vmWriter.writePush(Segment::CONST, int(c));
         vmWriter.writeCall("String.appendChar", 2);
     }
-
-    return true;
 };
 
 void CompilationEngine::compileArrayLiteral(Segment::Enum segment,
@@ -554,7 +523,7 @@ Token CompilationEngine::consume(MatchOptions options) {
         }
     }
 
-    throw CompilationError{expected("opts")};
+    throw CompilationError{expected(options)};
 };
 
 bool CompilationEngine::match(MatchOptions options) {
@@ -568,11 +537,15 @@ bool CompilationEngine::matchNext(MatchOptions options) {
                      (*next).tokenType) != std::end(options);
 };
 
-const std::string CompilationEngine::expected(std::string message) {
-    // TODO: stringify options
+const std::string CompilationEngine::expected(MatchOptions options) {
+    std::vector<std::string> opts;
+    std::transform(options.begin(), options.end(), std::back_inserter(opts),
+                   [](const TokenType &opt) { return tokenString(opt); });
+    const std::string optList = boost::algorithm::join(opts, ", ");
+
     std::stringstream ss{};
-    ss << "l" << (*token).lineNumber << ": expected " << message
-       << ", received '" << (*token).src << "'" << std::endl;
+    ss << "Line " << (*token).lineNumber << ": expected '" << optList << "'. "
+       << "But received '" << (*token).src << "'" << std::endl;
     return ss.str();
 };
 

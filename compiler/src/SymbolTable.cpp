@@ -71,7 +71,10 @@ Symbol SymbolTable::getSymbol(Token name) {
     if (cIter != classMap.end()) {
         return srIter->second;
     }
-    throw SymbolNotFoundError{name.src};
+
+    std::stringstream ss {};
+    ss << "Line " << name.lineNumber << ": encountered unknown symbol " + name.src;
+    throw SymbolNotFoundError{ss.str()};
 };
 
 int SymbolTable::getCount(const SymbolKind::Enum &kind) {

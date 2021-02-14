@@ -36,14 +36,10 @@ std::string JackTokenizer::scan() {
     }
 
     if (lexeme[0] == '\n') {
-        lineNumber++;
         return "";
     }
     if (lexeme[0] == '\"') {
         while (peek() != '\"') {
-            if (peek() == '\n') {
-                lineNumber++;
-            }
             lexeme += advance();
         }
         lexeme += advance(); // add the second "
@@ -58,7 +54,7 @@ void JackTokenizer::skipCommentBlock() {
         while (peek() != '\n') {
             advance();
         }
-        lineNumber++;
+        // lineNumber++;
     }
 
     if (!(peek() == '/' && peekNext() == '*')) {
@@ -68,15 +64,19 @@ void JackTokenizer::skipCommentBlock() {
     it.seekg(2, std::ios::cur);
 
     while (!(peek() == '*' && peekNext() == '/')) {
-        if (advance() == '\n') {
-            lineNumber++;
-        }
+        advance();
     }
 
     it.seekg(2, std::ios::cur);
 };
 
-char JackTokenizer::advance() { return it.get(); }
+char JackTokenizer::advance() {
+    char c = it.get();
+    if (c == '\n') {
+        lineNumber++;
+    }
+    return c;
+}
 
 char JackTokenizer::peek() { return it.peek(); }
 

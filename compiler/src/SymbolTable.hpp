@@ -10,7 +10,8 @@
 
 class SymbolNotFoundError : public std::exception {
   public:
-    SymbolNotFoundError(std::string msg) : msg(msg.c_str()) {}
+    SymbolNotFoundError(const char *msg) : msg{msg} {}
+    SymbolNotFoundError(std::string msg) : SymbolNotFoundError{msg.c_str()} {}
     [[nodiscard]] const char *what() const noexcept override { return msg; }
 
   private:

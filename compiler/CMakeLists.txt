@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project (compiler)
 
+set (CMAKE_CXX_STANDARD 17)
+
 file(GLOB_RECURSE sources src/*.cpp src/*.hpp)
 file(GLOB_RECURSE test_sources test/*.cpp)
 
