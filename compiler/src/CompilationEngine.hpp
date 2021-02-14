@@ -25,7 +25,7 @@ class CompilationEngine {
     void compileSubroutineDec();
     void compileParameterList();
     void compileVarDec();
-    void compileSubroutineBody(Token name, Token keyword);
+    void compileSubroutineBody(const Token &name, const Token &keyword);
     void compileStatements();
     void compileStatement();
     void compileLet();
@@ -42,15 +42,13 @@ class CompilationEngine {
     void compileKeywordConstant();
     void compileIntConst();
     void compileStringConst();
-    void compileArrayLiteral(Segment::Enum, Symbol);
+    void compileArrayLiteral(const Segment::Enum&, const Symbol&);
 
   private:
     Token consume(MatchOptions);
     bool match(MatchOptions);
     bool matchNext(MatchOptions);
     Token readType();
-    bool zeroOrOnce(const std::function<void(void)> &);
-    bool zeroOrMany(const std::function<bool(void)> &);
     const std::string expected(MatchOptions);
     const std::string newLabel();
     TokenList::iterator token;

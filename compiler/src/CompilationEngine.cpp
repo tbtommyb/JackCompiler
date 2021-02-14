@@ -159,7 +159,8 @@ void CompilationEngine::compileVarDec() {
     consume({TokenType::SEMICOLON});
 };
 
-void CompilationEngine::compileSubroutineBody(Token name, Token keyword) {
+void CompilationEngine::compileSubroutineBody(const Token &name,
+                                              const Token &keyword) {
     // '{' varDec* statements '}'
 
     vmWriter.write("// Compiling subroutine body");
@@ -494,8 +495,8 @@ void CompilationEngine::compileStringConst() {
     }
 };
 
-void CompilationEngine::compileArrayLiteral(Segment::Enum segment,
-                                            Symbol symbol) {
+void CompilationEngine::compileArrayLiteral(const Segment::Enum &segment,
+                                            const Symbol &symbol) {
     consume({TokenType::LBRACKET});
     vmWriter.writePush(segment, symbol.id);
     compileExpression();
