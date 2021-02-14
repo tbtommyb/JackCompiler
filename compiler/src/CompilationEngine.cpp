@@ -31,22 +31,14 @@ MatchOptions keywords = {TokenType::COMP_TRUE, TokenType::COMP_FALSE,
                          TokenType::COMP_NULL, TokenType::THIS};
 
 CompilationEngine::CompilationEngine(TokenList &tokens, std::ostream &out)
-    : token{tokens.begin()}, vmWriter{out}, symbolTable{}, labelCount{0} {}
+    : token{tokens.begin()}, vmWriter{out}, symbolTable{},
+      labelCount{0} {}
 
 // Public compilation methods
 // ==========================
 
-bool CompilationEngine::compile() {
-    try {
-        compileClass();
-        return true;
-    } catch (const CompilationError &e) {
-        std::cerr << "Compilation error:\n" << e.what() << std::endl;
-        return false;
-    } catch (const SymbolNotFoundError &e) {
-        std::cerr << "Compilation error:\n" << e.what() << std::endl;
-        return false;
-    }
+void CompilationEngine::compile() {
+    compileClass();
 };
 
 void CompilationEngine::compileClass() {

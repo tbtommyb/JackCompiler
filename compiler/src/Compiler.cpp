@@ -18,12 +18,13 @@ void Compiler::run(std::string dir) {
 
     for (const auto &filePath : filesToProcess) {
         std::ifstream file{filePath.string()};
+        std::string inputPath{filePath.string()};
         assert(file.is_open());
 
         std::string outputPath = filePath.stem().string() + ".vm";
         std::ostringstream output{};
 
-        if (process(file, output)) {
+        if (process(inputPath, file, output)) {
             std::ofstream outputFile{outputPath};
             assert(outputFile.is_open());
             outputFile << output.str() << std::endl;
@@ -31,10 +32,22 @@ void Compiler::run(std::string dir) {
     }
 };
 
-bool Compiler::process(std::istream &program, std::ostream &out) {
-    JackTokenizer tokenizer{program};
-    TokenList tokens = tokenizer.tokenize();
+bool Compiler::process(const std::string &inputPath, std::istream &program,
+                       std::ostream &out) {
+    try {
+        JackTokenizer tokenizer{program};
+        TokenList tokens = tokenizer.tokenize();
 
-    CompilationEngine compiler{tokens, out};
-    return compiler.compile();
+        CompilationEngine compiler{tokens, out};
+        compiler.compile();
+        return true;
+    } catch (const CompilationError &e) {
+        std::cerr << "Compilation error in " << inputPath << ":\n"
+                  << e.what() << std::endl;
+        return false;
+    } catch (const SymbolNotFoundError &e) {
+        std::cerr << "Compilation error in " << inputPath << ":\n"
+                  << e.what() << std::endl;
+        return false;
+    }
 };

@@ -22,7 +22,7 @@ TEST_CASE("Expected .vm output", "[Compiler]") {
             std::stringstream content;
             content << expected.rdbuf();
 
-            Compiler{}.process(testInput, output);
+            Compiler{}.process(testCase, testInput, output);
             testInput.close();
             expected.close();
 

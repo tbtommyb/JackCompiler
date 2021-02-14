@@ -19,7 +19,7 @@ class CompilationEngine {
   public:
     CompilationEngine(TokenList &tokens, std::ostream &);
     ~CompilationEngine() = default;
-    bool compile();
+    void compile();
     void compileClass();
     void compileClassVarDec();
     void compileSubroutineDec();
