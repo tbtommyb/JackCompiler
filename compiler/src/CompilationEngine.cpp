@@ -542,7 +542,7 @@ bool CompilationEngine::matchNext(MatchOptions options) {
 const std::string CompilationEngine::expected(MatchOptions options) {
     std::vector<std::string> opts;
     std::transform(options.begin(), options.end(), std::back_inserter(opts),
-                   [](const TokenType &opt) { return tokenString(opt); });
+                   tokenString);
     const std::string optList = boost::algorithm::join(opts, ", ");
 
     std::stringstream ss{};
