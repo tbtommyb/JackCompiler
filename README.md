@@ -11,3 +11,7 @@ $ mkdir assemblr/build && cd assemblr/build
 $ cmake ..
 $ cmake --build .
 ```
+
+## Future
+
+The compiler mixes parsing with codegen. It would be good to parse to an AST and separate the two steps.
