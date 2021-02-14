@@ -21,7 +21,6 @@ void Compiler::run(std::string dir) {
         assert(file.is_open());
 
         std::string outputPath = filePath.stem().string() + ".vm";
-        assert(fs::exists(outputPath));
         std::ostringstream output{};
 
         if (process(file, output)) {
